@@ -1,0 +1,30 @@
+0xffff1000
+_pool+2-*
+// this is singal comment
+/// this is doc comment 1
+//! this is doc comment 2
+"fdsfadgag"
+'p'
+<=
+==
+!=
+>=
+||
+&&
+Pool main {};
+Life Fish {};
+let f: Fish = spawn Fish ();
+let i: usize = 0;
+let s: string = "str";
+for str in s {
+
+}
+while (true) {
+
+}
+const d: usize = 0;
+return;
+break;
+let f: bool = false;
+continue;
+loop {}

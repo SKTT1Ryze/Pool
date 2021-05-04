@@ -43,7 +43,8 @@ D               ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 BoolConstant    ::= true | false
 
-StringConstant  ::= "(单词)*"
+StringConstant  ::= "CharConstant*"
+CharConstant    ::= {\'([^'\\]|\\['"?\\abfnrtv]|\\[0-7]{1,3}|\\[Xx][0-9A-Fa-f]+|{UCN})+\'}
 ```
 
 ## 字符串文法
@@ -51,9 +52,9 @@ StringConstant  ::= "(单词)*"
 
 ## 初步文法
 ```
-App                 ::= PoolDef LifeDef+
+App                 ::= PoolDef LifeDef*
 // 池定义
-PoolDef             ::= Pool identifier { Field* }
+PoolDef             ::= Pool identifier StmtBlock
 
 // 类型
 Type                ::= usize | bool | string | life identifier | Type []
@@ -62,8 +63,49 @@ Type                ::= usize | bool | string | life identifier | Type []
 LifeDef             ::= Life identifier <inherit identifier> <compete identifier> <cooperate identifier> <hunt identifier> { Field* }
 
 // 生命实例定义
-LifeInstanceDef     ::= LifeInstance ;
-LifeInstance        ::= let identifier: Type
+LifeInstanceDef     ::= let LifeInstance ;
+LifeInstance        ::= identifier: Type
 
-FunctionDef         ::= fn identifier ( Formals )
+// 函数定义
+FunctionDef         ::= fn identifier ( Formals ) <-> Type> StmtBlock
+Formals             ::= LifeInstance+, | null
+
+
+// 生命类型定义内部
+Field               ::= LifeInstance ,
+
+// 作用域体定义
+StmtBlock           ::= { Stmt* }
+
+Stmt                ::= LifeInstanceDef | SimpleStmt ; | IfStmt | WhileStmt | ForStmt | BreakStmt ; | ReturnStmt ; | StmtBlock
+
+SimpleStmt          ::= LVaule = Expr | Call | null
+
+// 左值
+LVaule              ::= <Expr.> identifier | Expr [Expr]
+Call                ::= <Expr.> identifier ( Actuals )
+Actuals             ::= Expr+, | null
+
+// for 循环
+ForStmt             ::= for identifier in Expr StmtBlock
+
+// while 循环
+WhileStmt           ::= while ( BoolExpr ) StmtBlock
+
+// If 条件判断
+IfStmt              ::= if ( BoolExpr ) StmtBlock <else StmtBlock>
+
+// return
+ReturnStmt          ::= return | return Expr
+
+// break
+BreakStmt           ::= break
+
+BoolExpr            ::= Expr
+
+Expr                ::= Constant | LValue | Call | (Expr) | Expr + Expr | Expr - Expr | Expr * Expr | Expr / Expr | Expr % Expr | - Expr |
+    Expr < Expr | Expr <= Expr | Expr > Expr | Expr >= Expr | Expr == Expr | Expr != Expr | Expr && Expr | Expr || Expr | !Expr |
+    life identifier () | life Type [ Expr ]
+
+Comment             ::= // StringConstant
 ```
