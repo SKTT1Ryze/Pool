@@ -1,4 +1,3 @@
-/* 池语言词法分析 Flex 源程序 */
 
 %{
 #include "pool.h"
