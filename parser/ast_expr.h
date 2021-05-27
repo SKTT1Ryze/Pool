@@ -17,10 +17,11 @@
 class NamedType; // for new
 class Type; // for NewArray
 
-
+// 表达式类型，继承 Stmt
 class Expr : public Stmt 
 {
   public:
+    // 位置
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 };
@@ -28,23 +29,27 @@ class Expr : public Stmt
 /* This node type is used for those places where an expression is optional.
  * We could use a NULL pointer, but then it adds a lot of checking for
  * NULL. By using a valid, but no-op, node, we save that trouble */
+// 空表达式
 class EmptyExpr : public Expr
 {
   public:
     const char *GetPrintNameForNode() { return "Empty"; }
 };
 
+// 整型常量
 class IntConstant : public Expr 
 {
   protected:
     int value;
   
   public:
+    // 位置，值
     IntConstant(yyltype loc, int val);
     const char *GetPrintNameForNode() { return "IntConstant"; }
     void PrintChildren(int indentLevel);
 };
 
+// 浮点常量
 class DoubleConstant : public Expr 
 {
   protected:
@@ -56,6 +61,7 @@ class DoubleConstant : public Expr
     void PrintChildren(int indentLevel);
 };
 
+// 布尔常量
 class BoolConstant : public Expr 
 {
   protected:
@@ -67,6 +73,7 @@ class BoolConstant : public Expr
     void PrintChildren(int indentLevel);
 };
 
+// 字符串常量
 class StringConstant : public Expr 
 { 
   protected:
@@ -78,6 +85,7 @@ class StringConstant : public Expr
     void PrintChildren(int indentLevel);
 };
 
+// Null常量
 class NullConstant: public Expr 
 {
   public: 
@@ -85,6 +93,7 @@ class NullConstant: public Expr
     const char *GetPrintNameForNode() { return "NullConstant"; }
 };
 
+// 操作符
 class Operator : public Node 
 {
   protected:
@@ -96,6 +105,7 @@ class Operator : public Node
     void PrintChildren(int indentLevel);
  };
  
+// 复合表达式，算术表达式，逻辑表达式等的基类
 class CompoundExpr : public Expr
 {
   protected:
@@ -108,6 +118,7 @@ class CompoundExpr : public Expr
     void PrintChildren(int indentLevel);
 };
 
+// 算术表达式
 class ArithmeticExpr : public CompoundExpr 
 {
   public:
@@ -116,6 +127,7 @@ class ArithmeticExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "ArithmeticExpr"; }
 };
 
+// 关系表达式
 class RelationalExpr : public CompoundExpr 
 {
   public:
@@ -123,6 +135,7 @@ class RelationalExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "RelationalExpr"; }
 };
 
+// 相等表达式
 class EqualityExpr : public CompoundExpr 
 {
   public:
@@ -130,6 +143,7 @@ class EqualityExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "EqualityExpr"; }
 };
 
+// 逻辑表达式
 class LogicalExpr : public CompoundExpr 
 {
   public:
@@ -138,6 +152,7 @@ class LogicalExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "LogicalExpr"; }
 };
 
+// 赋值表达式
 class AssignExpr : public CompoundExpr 
 {
   public:
@@ -145,12 +160,14 @@ class AssignExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "AssignExpr"; }
 };
 
+// 左值表达式
 class LValue : public Expr 
 {
   public:
     LValue(yyltype loc) : Expr(loc) {}
 };
 
+// This 表达式
 class This : public Expr 
 {
   public:
@@ -158,6 +175,7 @@ class This : public Expr
     const char *GetPrintNameForNode() { return "This"; }
 };
 
+// 数组访问表达式
 class ArrayAccess : public LValue 
 {
   protected:
@@ -240,5 +258,4 @@ class ReadLineExpr : public Expr
     const char *GetPrintNameForNode() { return "ReadLineExpr"; }
 };
 
-    
 #endif

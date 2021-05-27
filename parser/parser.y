@@ -439,5 +439,5 @@ AExpr   : ',' Expr AExpr          { ($$ = $3)->InsertAt($2, 0); }
 void InitParser()
 {
    PrintDebug("parser", "Initializing parser");
-   yydebug = false  ;
+   yydebug = false;
 }

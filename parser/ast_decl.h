@@ -34,9 +34,9 @@ class VarDecl : public Decl
     Type *type;
     
   public:
-    VarDecl(Identifier *name, Type *type);
+    VarDecl(Identifier *name, Type *type); // 变量名字，变量类型
     const char *GetPrintNameForNode() { return "VarDecl"; }
-    void PrintChildren(int indentLevel);
+    void PrintChildren(int indentLevel); // 打印子结点
 };
 
 // 类声明
@@ -48,6 +48,7 @@ class ClassDecl : public Decl
     List<NamedType*> *implements;
 
   public:
+    // 类名字，继承的接口，实现的接口，内部成员
     ClassDecl(Identifier *name, NamedType *extends, 
               List<NamedType*> *implements, List<Decl*> *members);
     const char *GetPrintNameForNode() { return "ClassDecl"; }
@@ -61,6 +62,7 @@ class InterfaceDecl : public Decl
     List<Decl*> *members;
     
   public:
+    // 接口名字，接口成员
     InterfaceDecl(Identifier *name, List<Decl*> *members);
     const char *GetPrintNameForNode() { return "InterfaceDecl"; }
     void PrintChildren(int indentLevel);
@@ -73,7 +75,8 @@ class FnDecl : public Decl
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
-    
+  
+  // 函数名字，返回值类型，参数列表
   public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
