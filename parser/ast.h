@@ -34,6 +34,7 @@
 #include <stdlib.h>   // for NULL
 #include "location.h"
 
+// 语法树结点
 class Node 
 {
   protected:
@@ -56,7 +57,7 @@ class Node
     virtual void PrintChildren(int indentLevel)  {}
 };
    
-
+/*标识符*/
 class Identifier : public Node 
 {
   protected:

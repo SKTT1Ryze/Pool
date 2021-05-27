@@ -29,6 +29,7 @@ class Type : public Node
     void PrintChildren(int indentLevel);
 };
 
+// 自定义的类型
 class NamedType : public Type 
 {
   protected:
@@ -41,6 +42,8 @@ class NamedType : public Type
     void PrintChildren(int indentLevel);
 };
 
+// 类型列表类型
+// 类似：Type []
 class ArrayType : public Type 
 {
   protected:

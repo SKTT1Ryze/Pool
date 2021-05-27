@@ -16,8 +16,11 @@
  */
 typedef struct yyltype
 {
-    int timestamp;                 // you can ignore this field
+    // you can ignore this field
+    int timestamp;
+    // 首行，首列
     int first_line, first_column;
+    // 尾行，尾列
     int last_line, last_column;      
     char *text;                    // you can also ignore this field
 } yyltype;

@@ -33,53 +33,80 @@ static void DoBeforeEachAction();
  * I added to first match each line and copy it ot the list of lines
  * read before re-processing it. This allows us to print the entire
  * line later to provide context on errors.
+ * todo: 理解这里
  */
+
+/*初始状态*/
 %s N
+/*
+ * %x 是状态定义
+ * 这里定义了两个状态
+ */
 %x COPY COMM
 %option stack
 
-/* Definitions
- * -----------
- * To make our rules more readable, we establish some definitions here.
- */
+/*十进制数字*/
 DIGIT             ([0-9])
+/*十六进制数字*/
 HEX_DIGIT         ([0-9a-fA-F])
+/*十六进制整形*/
 HEX_INTEGER       (0[Xx]{HEX_DIGIT}+)
+/*整形*/
 INTEGER           ({DIGIT}+)
+/*指数*/
 EXPONENT          ([Ee][-+]?{INTEGER})
+/*浮点数*/
 DOUBLE            ({INTEGER}"."{DIGIT}*{EXPONENT}?)
+/*没闭合的字符串*/
 BEG_STRING        (\"[^"\n]*)
+/*闭合的字符串*/
 STRING            ({BEG_STRING}\")
-IDENTIFIER        ([a-zA-Z][a-zA-Z_0-9]*)
+/*标识符*/
+IDENTIFIER        ([_a-zA-Z][a-zA-Z_0-9]*)
+/*运算符*/
 OPERATOR          ([-+/*%=.,;!<>()[\]{}])
+/*块注释开头*/
 BEG_COMMENT       ("/*")
+/*块注释结尾*/
 END_COMMENT       ("*/")
+/*单行注释*/
 SINGLE_COMMENT    ("//"[^\n]*)
 
-%%             /* BEGIN RULES SECTION */
 
-<COPY>.*               { char curLine[512];
-                         //strncpy(curLine, yytext, sizeof(curLine));
-                         savedLines.Append(strdup(yytext)); // strdup函数：分配空间，复制字符串，返回地址
-                         curColNum = 1; yy_pop_state(); yyless(0); }
-<COPY><<EOF>>          { yy_pop_state(); }
-<*>\n                  { curLineNum++; curColNum = 1;
-                         if (YYSTATE == COPY) savedLines.Append("");
-                         else yy_push_state(COPY); }
+/* 词法规则定义 */
+%%             
 
-[ ]+                   { /* ignore all spaces */  }
-<*>[\t]                { curColNum += TAB_SIZE - curColNum%TAB_SIZE + 1; }
+<COPY>.*                { 
+                           char curLine[512];
+                            //strncpy(curLine, yytext, sizeof(curLine));
+                           savedLines.Append(strdup(yytext)); // strdup函数：分配空间，复制字符串，返回地址
+                           curColNum = 1; /*行数自增*/
+                           yy_pop_state(); /*从栈出弹出下一个状态成为当前状态*/
+                           yyless(0); /*重新放入输入流*/
+                        }
 
- /* -------------------- Comments ----------------------------- */
-{BEG_COMMENT}          { BEGIN(COMM); }
-<COMM>{END_COMMENT}    { BEGIN(N); }
-<COMM><<EOF>>          { ReportError::UntermComment();
-                         return 0; }
-<COMM>.                { /* ignore everything else that doesn't match */ }
-{SINGLE_COMMENT}       { /* skip to end of line for // comment */ }
+<COPY><<EOF>>           { yy_pop_state(); }
+
+<*>\n                   { 
+                           curLineNum++;
+                           curColNum = 1;
+                           if (YYSTATE == COPY) savedLines.Append("");
+                           else yy_push_state(COPY);
+                        }
+
+[ ]+                    { /* 跳过所有空格 */  }
+
+<*>[\t]                 { curColNum += TAB_SIZE - curColNum%TAB_SIZE + 1; }
+
+ /* -------------------- 注释 ----------------------------- */
+{BEG_COMMENT}           { BEGIN(COMM); /*进入块注释状态*/}
+<COMM>{END_COMMENT}     { BEGIN(N); /*结束块注释状态，进入默认状态*/}
+<COMM><<EOF>>           { ReportError::UntermComment(); return 0; /*块注释没闭合，错误*/ }
+<COMM>.                 { /* 跳过 */ }
+{SINGLE_COMMENT}        { /* 跳过单行注释 */ }
 
 
- /* --------------------- Keywords ------------------------------- */
+ /* --------------------- 关键字 ------------------------------- */
 "void"              { return T_Void;        }
 "int"               { return T_Int;         }
 "double"            { return T_Double;      }
@@ -105,7 +132,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 
 
 
- /* -------------------- Operators ----------------------------- */
+ /* -------------------- 操作符 ----------------------------- */
 "<="                { return T_LessEqual;   }
 ">="                { return T_GreaterEqual;}
 "=="                { return T_Equal;       }
@@ -116,29 +143,32 @@ SINGLE_COMMENT    ("//"[^\n]*)
     
 "[]"                { return T_Dims;        }
 
- /* -------------------- Constants ------------------------------ */
-"true"|"false"      { yylval.boolConstant = (yytext[0] == 't');
+ /* -------------------- 常量 ------------------------------ */
+"true"|"false"      { yylval.boolConstant = (yytext[0] == 't'); // yylval 在 parser.y 里面定义
                          return T_BoolConstant; }
-{INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10);
+{INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10); // strtol: 将字符串转换为 long 类型，第三个参数指定进制
                          return T_IntConstant; }
 {HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, NULL, 16);
                          return T_IntConstant; }
-{DOUBLE}            { yylval.doubleConstant = atof(yytext);
+{DOUBLE}            { yylval.doubleConstant = atof(yytext); // atof: 将字符串转换成 double
                          return T_DoubleConstant; }
 {STRING}            { yylval.stringConstant = strdup(yytext); 
                          return T_StringConstant; }
-{BEG_STRING}        { ReportError::UntermString(&yylloc, yytext); }
+{BEG_STRING}        { ReportError::UntermString(&yylloc, yytext); 
+                        /*没闭合的字符串*/ 
+                    }
 
 
- /* -------------------- Identifiers --------------------------- */
-{IDENTIFIER}        { if (strlen(yytext) > MaxIdentLen)
-                         ReportError::LongIdentifier(&yylloc, yytext);
-                       strncpy(yylval.identifier, yytext, MaxIdentLen);
-                       yylval.identifier[MaxIdentLen] = '\0';
-                       return T_Identifier; }
+ /* -------------------- 标识符 --------------------------- */
+{IDENTIFIER}         {
+                        if (strlen(yytext) > MaxIdentLen) ReportError::LongIdentifier(&yylloc, yytext);
+                        strncpy(yylval.identifier, yytext, MaxIdentLen); // strncpy: 复制字符串的前 n 个字符
+                        yylval.identifier[MaxIdentLen] = '\0'; // todo: 这里的逻辑有点不清楚
+                        return T_Identifier;
+                     }
 
 
- /* -------------------- Default rule (error) -------------------- */
+ /* -------------------- 错误 -------------------- */
 .                   { ReportError::UnrecogChar(&yylloc, yytext[0]); }
 
 %%
@@ -155,11 +185,12 @@ SINGLE_COMMENT    ("//"[^\n]*)
  * is printed. Setting it to true will give you a running trail that might
  * be helpful when debugging your scanner. Please be sure the variable is
  * set to false when submitting your final version.
+ * 任意时候调用 yylex() 之前都会调用这个函数
  */
 void InitScanner()
 {
     PrintDebug("lex", "Initializing scanner");
-    yy_flex_debug = false;
+    yy_flex_debug = false; // 这里初始化是否打印调试信息
     BEGIN(N);
     yy_push_state(COPY); // copy first line at start
     curLineNum = 1;
@@ -173,10 +204,11 @@ void InitScanner()
  * to group code common to all actions.
  * On each match, we fill in the fields to record its location and
  * update our column counter.
+ * 记录代码扫描位置
  */
 static void DoBeforeEachAction()
 {
-   yylloc.first_line = curLineNum;
+   yylloc.first_line = curLineNum; // yylloc 是位置信息，会反馈给 bison
    yylloc.first_column = curColNum;
    yylloc.last_column = curColNum + yyleng - 1;
    curColNum += yyleng;
@@ -188,6 +220,8 @@ static void DoBeforeEachAction()
  * contents of that line are not available.  Our scanner copies
  * each line scanned and appends each to a list so we can later
  * retrieve them to report the context for errors.
+ * 返回给定行号的代码
+ * scanner 复制了一份源码保存在 savedLines 中
  */
 const char *GetLineNumbered(int num) {
    if (num <= 0 || num > savedLines.NumElements()) return NULL;

@@ -17,6 +17,7 @@ class NamedType;
 class Identifier;
 class Stmt;
 
+// 所有定义的父类
 class Decl : public Node 
 {
   protected:
@@ -26,6 +27,7 @@ class Decl : public Node
     Decl(Identifier *name);
 };
 
+// 变量声明
 class VarDecl : public Decl 
 {
   protected:
@@ -37,6 +39,7 @@ class VarDecl : public Decl
     void PrintChildren(int indentLevel);
 };
 
+// 类声明
 class ClassDecl : public Decl 
 {
   protected:
@@ -51,7 +54,8 @@ class ClassDecl : public Decl
     void PrintChildren(int indentLevel);
 };
 
-class InterfaceDecl : public Decl 
+// 接口声明
+class InterfaceDecl : public Decl
 {
   protected:
     List<Decl*> *members;
@@ -62,6 +66,7 @@ class InterfaceDecl : public Decl
     void PrintChildren(int indentLevel);
 };
 
+// 函数声明
 class FnDecl : public Decl 
 {
   protected:

@@ -34,7 +34,7 @@ void yyerror(char *msg); // standard error-handling routine
  * Here we define the type of the yylval global variable that is used by
  * the scanner to store attibute information about the token just scanned
  * and thus communicate that information to the parser. 
- *
+ * 定义全局变量 yylval，用于 scanner 保存 token 的属性并且让其通过这个和 parser 交互
  * pp2: You will need to add new fields to this union as you add different 
  *      attributes to your non-terminal symbols.
  */
@@ -73,6 +73,7 @@ void yyerror(char *msg); // standard error-handling routine
  * Here we tell yacc about all the token types that we are using.
  * Yacc will assign unique numbers to these and export the #define
  * in the generated y.tab.h header file.
+ * 终结符
  */
 %token   T_Void T_Bool T_Int T_Double T_String T_Class 
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
@@ -80,10 +81,15 @@ void yyerror(char *msg); // standard error-handling routine
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
 
+/*标识符*/
 %token   <identifier> T_Identifier
+/*字符串常量*/
 %token   <stringConstant> T_StringConstant 
+/*整形常量*/
 %token   <integerConstant> T_IntConstant
+/*浮点数常量*/
 %token   <doubleConstant> T_DoubleConstant
+/*布尔类型常量*/
 %token   <boolConstant> T_BoolConstant
 
 
@@ -97,6 +103,7 @@ void yyerror(char *msg); // standard error-handling routine
  * $n which corresponds to a DeclList nonterminal we are accessing the field
  * of the union named "declList" which is of type List<Decl*>.
  * pp2: You'll need to add many of these of your own.
+ * 非终结符
  */
 %type <declList>      DeclList 
 %type <decl>          Decl
@@ -132,6 +139,8 @@ void yyerror(char *msg); // standard error-handling routine
 %type <decl>          Field
 %type <interfaceList> AInterface
 
+/*运算符*/
+/*%left 左结合，%right 右结合，%nonassoc 无结合*/
 %nonassoc '='
 %left T_Or
 %left T_And
@@ -148,9 +157,9 @@ void yyerror(char *msg); // standard error-handling routine
  * -----
  * All productions and actions should be placed between the start and stop
  * %% markers which delimit the Rules section.
-   
+ * 规约规则
  */
-
+/*总程序，由一系列定义的列表组成*/
 Program   :    DeclList            { 
                                       @1; 
                                       /* pp2: The @1 is needed to convince 
@@ -164,37 +173,43 @@ Program   :    DeclList            {
           ;
 
 //1 o mas
-DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
-          |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
+/*声明列表产生式*/
+DeclList  :    DeclList Decl        { ($$=$1)->Append($2); /*先对 DeclList 进行规约，然后将 Decl 添加到规约后的结果中*/}
+          |    Decl                 { ($$ = new List<Decl*>)->Append($1); /*新建一个列表，存放声明*/}
           ;
 
-Decl      :    VariableDecl          { $$ = $1; }
-          |    InterfaceDecl         { $$ = $1; }
-          |    ClassDecl             { $$ = $1; }
-          |    FunctionDecl          { $$ = $1; }
+Decl      :    VariableDecl          { /*变量声明*/ $$ = $1; }
+          |    InterfaceDecl         { /*接口声明*/ $$ = $1; }
+          |    ClassDecl             { /*类声明*/ $$ = $1; }
+          |    FunctionDecl          { /*函数声明*/ $$ = $1; }
           ;
 
+/*变量声明产生式*/
 VariableDecl  :  Variable ';' { $$ = $1; }
               ;
 
+/*类型 标识符*/
 Variable  :    Type T_Identifier  { 
-                                    Identifier *varName = new Identifier(@2, $2);
+                                    Identifier *varName = new Identifier(@2, $2); // @n 表示产生式右部第 n 个元素的位置
                                     $$ = new VarDecl( varName, $1 );
                                   }
           ;
 
-Type      :    T_Int          { $$ = Type::intType; }
+/*类型的产生式*/
+Type      :    T_Int          { $$ = Type::intType; /*Type 类型在 ast_type.h 里面定义*/}
           |    T_Double       { $$ = Type::doubleType; }
           |    T_Bool         { $$ = Type::boolType; }
           |    T_String       { $$ = Type::stringType; }
           |    T_Void         { $$ = Type::voidType; }
           |    T_Identifier   {
-                                Identifier *udfType = new Identifier(@1, $1);
-                                $$ = new NamedType(udfType);
+                                // 自定义的类型
+                                Identifier *udfType = new Identifier(@1, $1); // Identifier 类型在 ast.h 里面定义
+                                $$ = new NamedType(udfType); /*NamedType 在 ast_type.h 里面定义*/
                               }
-          |    Type T_Dims    { $$ = new ArrayType(@1, $1); }
+          |    Type T_Dims    { /*类型的列表*/ $$ = new ArrayType(@1, $1); }
           ;
 
+/*接口声明的产生式*/
 InterfaceDecl : T_Interface T_Identifier '{' PrototypeList '}' {
                                               Identifier* interfaceName = new Identifier(@2, $2);
                                               $$ = new InterfaceDecl( interfaceName, $4 );
@@ -202,36 +217,44 @@ InterfaceDecl : T_Interface T_Identifier '{' PrototypeList '}' {
               ;
 
 //0 o mas
-PrototypeList : Prototype PrototypeList     { ($$ = $2)->InsertAt($1, 0); }
+// 原型声明列表产生式
+PrototypeList : Prototype PrototypeList     { ($$ = $2)->InsertAt($1, 0); /*添加的原型放在列表的头部*/}
               |                             { $$ = new List< Decl* >(); }
               ;
 
+// 原型产生式
 Prototype : Type T_Identifier '(' ParamsList ')' ';' {
                                               Identifier *funcName = new Identifier(@2, $2);
                                               $$ = new FnDecl(funcName, $1, $4);
                                             }
           ;
 
+// 参数列表声明产生式
 ParamsList : Param AParam     { ($$ = $2)->InsertAt($1, 0); }
-           |                  { $$ = new List< VarDecl* >(); }
+           |                  { $$ = new List< VarDecl* >(); /*创建一个空列表，元素是 VarDecl 的指针*/ }
            ;
 
+// 第一个后面的参数的产生式
 AParam : ',' Param AParam     { ($$ = $3)->InsertAt($2, 0); }
        |                      { $$ = new List< VarDecl* >(); } 
        ;
 
+// 第一个参数的产生式
 Param : Variable              { $$ = $1; }
       ;
 
+// 函数声明产生式
 FunctionDecl  : Type T_Identifier '(' ParamsList ')' StmtBlock {
                                               Identifier* functionName = new Identifier(@2, $2);
                                               $$ = new FnDecl(functionName, $1, $4);
-                                              $$->SetFunctionBody($6);
+                                              $$->SetFunctionBody($6); /* 设置函数体 */
                                             }
               ;
 
+// 类声明产生式
 ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               {
+                // 普通类声明
                 $$ = new ClassDecl(new Identifier(@2, $2), 
                                     NULL, 
                                     new List< NamedType* >(), 
@@ -239,6 +262,7 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               }
             | T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}'
               {
+                // 继承接口的类声明
                 $$ = new ClassDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     new List< NamedType* >(), 
@@ -246,6 +270,7 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               }
             | T_Class T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
+                // 实现接口的类声明
                 $$ = new ClassDecl(new Identifier(@2, $2), 
                                     NULL, 
                                     $4, 
@@ -253,6 +278,7 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               }
             | T_Class T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
+                // 既继承接口又实现接口的类声明
                 $$ = new ClassDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     $6, 
@@ -260,6 +286,7 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               }
             ;
 
+// 接口列表
 InterfaceList   : T_Identifier AInterface     { ($$ = $2)->InsertAt(new NamedType(new Identifier(@1, $1)), 0); }
                 ;
 
@@ -267,14 +294,17 @@ AInterface  : ',' T_Identifier AInterface     { ($$ = $3)->InsertAt(new NamedTyp
             |                                 { $$ = new List< NamedType* >(); }
             ;
 
+// 类内部成员列表产生式
 FieldList   : Field FieldList     { ($$ = $2)->InsertAt($1, 0); }
             |                     { $$ = new List< Decl* >(); }
             ;
 
+// 类内部成员产生式
 Field : VariableDecl              { $$ = $1; }
       | FunctionDecl              { $$ = $1; }
       ;
 
+// 代码块产生式
 StmtBlock : '{' VariableDeclList StmtList '}' {
                                               $$ = new StmtBlock($2, $3);
                                             }
@@ -354,11 +384,13 @@ Expr  : LValue '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="
       | T_NewArray '(' Expr ',' Type ')' { $$ = new NewArrayExpr(@1, $3, $5);  }
       ;
 
+// 左值产生式
 LValue  : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
         | Expr '.' T_Identifier  { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
         | Expr '[' Expr ']'      { $$ = new ArrayAccess(@1, $1, $3); }
         ;
 
+// 常量产生式
 Constant  : T_IntConstant         { $$ = new IntConstant(@1, $1); }
           | T_DoubleConstant      { $$ = new DoubleConstant(@1, $1); }
           | T_BoolConstant        { $$ = new BoolConstant(@1, $1); }
@@ -366,6 +398,7 @@ Constant  : T_IntConstant         { $$ = new IntConstant(@1, $1); }
           | T_Null                { $$ = new NullConstant(@1); }
           ;
 
+// 函数调用产生式
 Call  : T_Identifier '(' Actuals ')' {
                                     $$ = new Call(@1, NULL, new Identifier(@1, $1), $3);
                                   }

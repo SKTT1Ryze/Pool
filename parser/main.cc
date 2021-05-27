@@ -22,7 +22,6 @@
 int main(int argc, char *argv[])
 {
     ParseCommandLine(argc, argv);
-  
     InitScanner();
     InitParser();
     yyparse();
