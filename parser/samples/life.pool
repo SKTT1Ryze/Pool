@@ -2,12 +2,12 @@ life Cow {
   let height : usize;
   let f1: f32;
   let isSpotted: bool;
-  void Moo() {
+  fn Moo(): void {
     Print ( this.height, " ", isSpotted, "\n" );
   }
 }
 
-void main() {
+fn main(): void {
   let betsy: Cow;
   betsy = spawn(Cow);
   betsy.Moo();

@@ -134,6 +134,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "let"				      { return T_Let; }
 "usize"				   { return T_Usize; }
 "f32"                { return T_F32; }
+"fn"                 { return T_Fn; }
 "->"				      { return T_FuncReturn; }
 "in"				      { return T_In; }
 "continue"			   { return T_Continue; }
