@@ -131,7 +131,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "ReadLine"          { return T_ReadLine;    }
 
  /* ---------下面是池语言特有的关键字----------- */
-"pool"               { return T_Pool; }
+"life"               { return T_Life; }
 "Life"               { return T_Life; }
 "spawn"              { return T_Spawn; }
 "let"				      { return T_Let; }

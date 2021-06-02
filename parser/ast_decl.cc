@@ -39,7 +39,7 @@ void ClassDecl::PrintChildren(int indentLevel) {
     members->PrintAll(indentLevel+1);
 }
 
-PoolDecl::PoolDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
+LifeDecl::LifeDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
     // extends can be NULL, impl & mem may be empty lists but cannot be NULL
     Assert(n != NULL && imp != NULL && m != NULL);     
     extends = ex;
@@ -48,7 +48,7 @@ PoolDecl::PoolDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Dec
     (members=m)->SetParentAll(this);
 }
 
-void PoolDecl::PrintChildren(int indentLevel) {
+void LifeDecl::PrintChildren(int indentLevel) {
     id->Print(indentLevel+1);
     if (extends) extends->Print(indentLevel+1, "(extends) ");
     implements->PrintAll(indentLevel+1, "(implements) ");

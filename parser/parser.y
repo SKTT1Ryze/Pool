@@ -64,7 +64,7 @@ void yyerror(char *msg); // standard error-handling routine
     IfStmt*             ifStmt;
     PrintStmt*          printStmt;
     ClassDecl*          classDecl;
-    PoolDecl*           poolDecl;
+    LifeDecl*           lifeDecl;
     List< NamedType* >* interfaceList;
 }
 
@@ -82,7 +82,7 @@ void yyerror(char *msg); // standard error-handling routine
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
-%token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
+%token   T_Life T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
 
 /*标识符*/
 %token   <identifier> T_Identifier
@@ -137,7 +137,7 @@ void yyerror(char *msg); // standard error-handling routine
 %type <printStmt>     PrintStmt
 %type <exprList>      PrintList
 %type <classDecl>     ClassDecl
-%type <poolDecl>      PoolDecl
+%type <lifeDecl>      LifeDecl
 %type <declList>      FieldList
 %type <interfaceList> InterfaceList
 %type <decl>          Field
@@ -185,7 +185,7 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); /*先对 DeclList 进
 Decl      :    VariableDecl          { /*变量声明*/ $$ = $1; }
           |    InterfaceDecl         { /*接口声明*/ $$ = $1; }
           |    ClassDecl             { /*类声明*/ $$ = $1; }
-          |    PoolDecl             { /*池声明*/ $$ = $1; }
+          |    LifeDecl             { /*池声明*/ $$ = $1; }
           |    FunctionDecl          { /*函数声明*/ $$ = $1; }
           ;
 
@@ -292,10 +292,10 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
             ;
 
 // 池声明产生式
-PoolDecl   : T_Pool T_Identifier '{' FieldList '}'
+LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               {
                 // 普通类声明
-                $$ = new PoolDecl(new Identifier(@2, $2), 
+                $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL, 
                                     new List< NamedType* >(), 
                                     $4);
@@ -303,7 +303,7 @@ PoolDecl   : T_Pool T_Identifier '{' FieldList '}'
             | T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}'
               {
                 // 继承接口的类声明
-                $$ = new PoolDecl(new Identifier(@2, $2), 
+                $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     new List< NamedType* >(), 
                                     $6);
@@ -311,7 +311,7 @@ PoolDecl   : T_Pool T_Identifier '{' FieldList '}'
             | T_Class T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 实现接口的类声明
-                $$ = new PoolDecl(new Identifier(@2, $2), 
+                $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL, 
                                     $4, 
                                     $6);
@@ -319,7 +319,7 @@ PoolDecl   : T_Pool T_Identifier '{' FieldList '}'
             | T_Class T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 既继承接口又实现接口的类声明
-                $$ = new PoolDecl(new Identifier(@2, $2), 
+                $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     $6, 
                                     $8);
