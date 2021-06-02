@@ -87,7 +87,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 
 <COPY><<EOF>>           { yy_pop_state(); }
 
-<*>\n                   { 
+<*>([\r]?\n)                   { 
                            curLineNum++;
                            curColNum = 1;
                            if (YYSTATE == COPY) savedLines.Append("");
@@ -129,6 +129,20 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "Print"             { return T_Print;       }
 "ReadInteger"       { return T_ReadInteger; }
 "ReadLine"          { return T_ReadLine;    }
+
+ /* ---------下面是池语言特有的关键字----------- */
+"pool"               { return T_Pool; }
+"Life"               { return T_Life; }
+"spawn"              { return T_Spawn; }
+"let"				      { return T_Let; }
+"usize"				   { return T_Usize; }
+"f32"                { return T_F32; }
+"->"				      { return T_FuncReturn; }
+"in"				      { return T_In; }
+"continue"			   { return T_Continue; }
+"const"				   { return T_Const; }
+"loop"				   { return T_Loop; }
+
 
 
 

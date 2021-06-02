@@ -64,6 +64,7 @@ void yyerror(char *msg); // standard error-handling routine
     IfStmt*             ifStmt;
     PrintStmt*          printStmt;
     ClassDecl*          classDecl;
+    PoolDecl*           poolDecl;
     List< NamedType* >* interfaceList;
 }
 
@@ -74,12 +75,14 @@ void yyerror(char *msg); // standard error-handling routine
  * Yacc will assign unique numbers to these and export the #define
  * in the generated y.tab.h header file.
  * 终结符
+ * 这些值会被生成到 y.tab.h 头文件里面去
  */
 %token   T_Void T_Bool T_Int T_Double T_String T_Class 
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
+%token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
 
 /*标识符*/
 %token   <identifier> T_Identifier
@@ -134,6 +137,7 @@ void yyerror(char *msg); // standard error-handling routine
 %type <printStmt>     PrintStmt
 %type <exprList>      PrintList
 %type <classDecl>     ClassDecl
+%type <poolDecl>      PoolDecl
 %type <declList>      FieldList
 %type <interfaceList> InterfaceList
 %type <decl>          Field
@@ -181,6 +185,7 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); /*先对 DeclList 进
 Decl      :    VariableDecl          { /*变量声明*/ $$ = $1; }
           |    InterfaceDecl         { /*接口声明*/ $$ = $1; }
           |    ClassDecl             { /*类声明*/ $$ = $1; }
+          |    PoolDecl             { /*池声明*/ $$ = $1; }
           |    FunctionDecl          { /*函数声明*/ $$ = $1; }
           ;
 
@@ -280,6 +285,41 @@ ClassDecl   : T_Class T_Identifier '{' FieldList '}'
               {
                 // 既继承接口又实现接口的类声明
                 $$ = new ClassDecl(new Identifier(@2, $2), 
+                                    new NamedType(new Identifier(@4, $4)), 
+                                    $6, 
+                                    $8);
+              }
+            ;
+
+// 池声明产生式
+PoolDecl   : T_Pool T_Identifier '{' FieldList '}'
+              {
+                // 普通类声明
+                $$ = new PoolDecl(new Identifier(@2, $2), 
+                                    NULL, 
+                                    new List< NamedType* >(), 
+                                    $4);
+              }
+            | T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}'
+              {
+                // 继承接口的类声明
+                $$ = new PoolDecl(new Identifier(@2, $2), 
+                                    new NamedType(new Identifier(@4, $4)), 
+                                    new List< NamedType* >(), 
+                                    $6);
+              }
+            | T_Class T_Identifier T_Implements InterfaceList '{' FieldList '}'
+              {
+                // 实现接口的类声明
+                $$ = new PoolDecl(new Identifier(@2, $2), 
+                                    NULL, 
+                                    $4, 
+                                    $6);
+              }
+            | T_Class T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
+              {
+                // 既继承接口又实现接口的类声明
+                $$ = new PoolDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     $6, 
                                     $8);

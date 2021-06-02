@@ -55,6 +55,22 @@ class ClassDecl : public Decl
     void PrintChildren(int indentLevel);
 };
 
+// 池声明
+class PoolDecl : public Decl
+{
+  protected:
+    List<Decl*> *members;
+    NamedType *extends;
+    List<NamedType*> *implements;
+  public:
+    // 池名字，继承的接口，实现的接口，内部成员
+    PoolDecl(Identifier *name, NamedType *extends, 
+              List<NamedType*> *implements, List<Decl*> *members);
+    const char *GetPrintNameForNode() { return "PoolDecl"; }
+    void PrintChildren(int indentLevel);
+};
+
+
 // 接口声明
 class InterfaceDecl : public Decl
 {
