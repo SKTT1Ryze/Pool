@@ -63,7 +63,6 @@ void yyerror(char *msg); // standard error-handling routine
     ReturnStmt*         returnStmt;
     IfStmt*             ifStmt;
     PrintStmt*          printStmt;
-    ClassDecl*          classDecl;
     LifeDecl*           lifeDecl;
     List< NamedType* >* interfaceList;
 }
@@ -77,7 +76,7 @@ void yyerror(char *msg); // standard error-handling routine
  * 终结符
  * 这些值会被生成到 y.tab.h 头文件里面去
  */
-%token   T_Void T_Bool T_String T_Class 
+%token   T_Void T_Bool T_String
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
@@ -136,7 +135,6 @@ void yyerror(char *msg); // standard error-handling routine
 %type <returnStmt>    ReturnStmt
 %type <printStmt>     PrintStmt
 %type <exprList>      PrintList
-%type <classDecl>     ClassDecl
 %type <lifeDecl>      LifeDecl
 %type <declList>      FieldList
 %type <interfaceList> InterfaceList
@@ -184,7 +182,6 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); /*先对 DeclList 进
 
 Decl      :    VariableDecl          { /*变量声明*/ $$ = $1; }
           |    InterfaceDecl         { /*接口声明*/ $$ = $1; }
-          |    ClassDecl             { /*类声明*/ $$ = $1; }
           |    LifeDecl             { /*池声明*/ $$ = $1; }
           |    FunctionDecl          { /*函数声明*/ $$ = $1; }
           ;
@@ -256,42 +253,8 @@ FunctionDecl  : Type T_Identifier '(' ParamsList ')' StmtBlock {
                                             }
               ;
 
-// 类声明产生式
-ClassDecl   : T_Class T_Identifier '{' FieldList '}'
-              {
-                // 普通类声明
-                $$ = new ClassDecl(new Identifier(@2, $2), 
-                                    NULL, 
-                                    new List< NamedType* >(), 
-                                    $4);
-              }
-            | T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}'
-              {
-                // 继承接口的类声明
-                $$ = new ClassDecl(new Identifier(@2, $2), 
-                                    new NamedType(new Identifier(@4, $4)), 
-                                    new List< NamedType* >(), 
-                                    $6);
-              }
-            | T_Class T_Identifier T_Implements InterfaceList '{' FieldList '}'
-              {
-                // 实现接口的类声明
-                $$ = new ClassDecl(new Identifier(@2, $2), 
-                                    NULL, 
-                                    $4, 
-                                    $6);
-              }
-            | T_Class T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
-              {
-                // 既继承接口又实现接口的类声明
-                $$ = new ClassDecl(new Identifier(@2, $2), 
-                                    new NamedType(new Identifier(@4, $4)), 
-                                    $6, 
-                                    $8);
-              }
-            ;
 
-// 池声明产生式
+// 生命类型声明产生式
 LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               {
                 // 普通类声明
@@ -300,7 +263,7 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
                                     new List< NamedType* >(), 
                                     $4);
               }
-            | T_Class T_Identifier T_Extends T_Identifier '{' FieldList '}'
+            | T_Life T_Identifier T_Extends T_Identifier '{' FieldList '}'
               {
                 // 继承接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
@@ -308,7 +271,7 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
                                     new List< NamedType* >(), 
                                     $6);
               }
-            | T_Class T_Identifier T_Implements InterfaceList '{' FieldList '}'
+            | T_Life T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 实现接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
@@ -316,7 +279,7 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
                                     $4, 
                                     $6);
               }
-            | T_Class T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
+            | T_Life T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 既继承接口又实现接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 

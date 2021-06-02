@@ -111,7 +111,6 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "bool"              { return T_Bool;        }
 "string"            { return T_String;      }
 "null"              { return T_Null;        }
-"class"             { return T_Class;       }
 "extends"           { return T_Extends;     }
 "this"              { return T_This;        }
 "interface"         { return T_Interface;   }

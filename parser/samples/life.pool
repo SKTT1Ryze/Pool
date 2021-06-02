@@ -1,11 +1,11 @@
 life Cow {
   usize height;
+  f32 f1;
   bool isSpotted;
   void Moo() {
     Print ( this.height, " ", isSpotted, "\n" );
   }
 }
-
 
 void main() {
   Cow betsy;
