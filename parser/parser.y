@@ -224,9 +224,9 @@ PrototypeList : Prototype PrototypeList     { ($$ = $2)->InsertAt($1, 0); /*添�
               ;
 
 // 原型产生式
-Prototype : Type T_Identifier '(' ParamsList ')' ';' {
+Prototype : T_Fn T_Identifier '(' ParamsList ')' T_FuncReturn Type ';' {
                                               Identifier *funcName = new Identifier(@2, $2);
-                                              $$ = new FnDecl(funcName, $1, $4);
+                                              $$ = new FnDecl(funcName, $7, $4);
                                             }
           ;
 

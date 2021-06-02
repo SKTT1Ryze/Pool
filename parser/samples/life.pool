@@ -3,7 +3,7 @@ life Animal {
 }
 
 // 鱼声明类型的声明
-life Fish inherit Animal hunts Shrimp {
+life Fish inherit Animal hunts Shrimp implements Swim {
   let size: usize;
   fn swim() -> void {
     println!("swimming!");
@@ -13,4 +13,24 @@ life Fish inherit Animal hunts Shrimp {
 // 虾声明类型的声明
 life Shrimp inherit Animal {
   let lenght: f32;
+}
+
+// 接口声明
+interface Swim {
+  fn swim() -> void;
+}
+
+fn main() -> void {
+  let fish: Fish;
+  let a: usize;
+  let b: f32;
+  let c: f32;
+  fish = spawn(Fish);
+  fish.swim();
+  c = a + b;
+  for (i = 0; i < 10; i= i + 1) {
+    println!("for loop");
+  }
+  while(true) {}
+  return;
 }
