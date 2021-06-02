@@ -81,7 +81,7 @@ void yyerror(char *msg); // standard error-handling routine
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
-%token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
+%token   T_New T_NewArray T_Println T_ReadInteger T_ReadLine
 %token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
 
 /*标识符*/
@@ -387,7 +387,7 @@ ReturnStmt  : T_Return Expr ';' { $$ = new ReturnStmt(@1, $2); }
             | T_Return ';'      { $$ = new ReturnStmt(@1, new EmptyExpr()); } 
             ;
 
-PrintStmt   : T_Print '(' PrintList ')' ';' { $$ = new PrintStmt($3); }
+PrintStmt   : T_Println '(' PrintList ')' ';' { $$ = new PrintStmt($3); }
             ;
 
 PrintList  : Expr AExpr           { ($$ = $2)->InsertAt($1, 0); }

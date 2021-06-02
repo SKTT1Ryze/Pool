@@ -124,7 +124,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "break"             { return T_Break;       }
 "New"               { return T_New;         }
 "NewArray"          { return T_NewArray;    }
-"Print"             { return T_Print;       }
+"println!"          { return T_Println;       }
 "ReadInteger"       { return T_ReadInteger; }
 "ReadLine"          { return T_ReadLine;    }
 
