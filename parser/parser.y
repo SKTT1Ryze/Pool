@@ -81,7 +81,7 @@ void yyerror(char *msg); // standard error-handling routine
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Println T_ReadInteger T_ReadLine
-%token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
+%token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop T_Colon
 
 /*标识符*/
 %token   <identifier> T_Identifier
@@ -187,19 +187,19 @@ Decl      :    VariableDecl          { /*变量声明*/ $$ = $1; }
           ;
 
 /*变量声明产生式*/
-VariableDecl  :  Variable ';' { $$ = $1; }
+VariableDecl  :  T_Let Variable ';' { $$ = $2; }
               ;
 
 /*类型 标识符*/
-Variable  :    Type T_Identifier  { 
-                                    Identifier *varName = new Identifier(@2, $2); // @n 表示产生式右部第 n 个元素的位置
-                                    $$ = new VarDecl( varName, $1 );
+Variable  :    T_Identifier T_Colon Type  { 
+                                    Identifier *varName = new Identifier(@2, $1); // @n 表示产生式右部第 n 个元素的位置
+                                    $$ = new VarDecl( varName, $3 );
                                   }
           ;
 
 /*类型的产生式*/
 Type      :    T_Usize        { $$ = Type::usizeType; /*Type 类型在 ast_type.h 里面定义*/}
-          |    T_F32       { $$ = Type::f32Type; }
+          |    T_F32          { $$ = Type::f32Type; }
           |    T_Bool         { $$ = Type::boolType; }
           |    T_String       { $$ = Type::stringType; }
           |    T_Void         { $$ = Type::voidType; }
@@ -218,7 +218,6 @@ InterfaceDecl : T_Interface T_Identifier '{' PrototypeList '}' {
                                             }
               ;
 
-//0 o mas
 // 原型声明列表产生式
 PrototypeList : Prototype PrototypeList     { ($$ = $2)->InsertAt($1, 0); /*添加的原型放在列表的头部*/}
               |                             { $$ = new List< Decl* >(); }

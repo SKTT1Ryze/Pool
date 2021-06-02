@@ -139,7 +139,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "continue"			   { return T_Continue; }
 "const"				   { return T_Const; }
 "loop"				   { return T_Loop; }
-
+":"                  { return T_Colon; }
 
 
 

@@ -1,19 +1,19 @@
-Program : DeclList
+Pool : DeclList
 
 DeclList : DeclList Decl
 	     | Decl
 
 Decl : VariableDecl 
      | FunctionDecl 
-     | ClassDecl 
+     | LifeDecl 
      | InterfaceDecl
 
 VariableDecl : Variable ';'
 
 Variable : Type ident
 
-Type : int 
-	 | 'double'
+Type : usize 
+	 | 'f32'
 	 | 'bool'
 	 | 'string'
 	 | 'void'
@@ -37,7 +37,7 @@ AParam : ',' Param AParam
 
 
 
-FunctionDec	l : Type ident ( ParamsList ) StmtBlock 
+FunctionDecl : Type ident ( ParamsList ) StmtBlock 
 
 StmtBlock : '{' VariableDeclList StmtList '}'
 
@@ -52,7 +52,7 @@ Stmt : <Expr>;
 
 
 
-ClassDecl ::= class ident <extends ident> <implements ident+ ,> { Field∗ }
+LifeDecl ::= life ident <extends ident> <implements ident+ ,> { Field∗ }
 Field ::= VariableDecl | FunctionDecl
 
 IfStmt ::= if ( Expr ) Stmt <else Stmt>
