@@ -113,7 +113,7 @@ Stmt : <Expr>;
 
 
 // 声明类型声明
-LifeDecl ::= life ident <extends ident> <implements ident+ ,> { Field∗ }
+LifeDecl ::= life ident <extends ident> <hunts ident+ ,> <implements ident+ ,> { Field∗ }
 Field ::= VariableDecl | FunctionDecl
 
 IfStmt ::= if ( Expr ) Stmt <else Stmt>
