@@ -3,7 +3,7 @@ life Cow {
   let f1: f32;
   let isSpotted: bool;
   fn Moo(): void {
-    Print ( this.height, " ", isSpotted, "\n" );
+    println!( this.height, " ", isSpotted, "\n" );
   }
 }
 

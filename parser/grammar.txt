@@ -8,9 +8,9 @@ Decl : VariableDecl
      | LifeDecl 
      | InterfaceDecl
 
-VariableDecl : Variable ';'
+VariableDecl : 'let' Variable ';'
 
-Variable : Type ident
+Variable : ident ':' Type
 
 Type : usize 
 	 | 'f32'
@@ -37,7 +37,7 @@ AParam : ',' Param AParam
 
 
 
-FunctionDecl : Type ident ( ParamsList ) StmtBlock 
+FunctionDecl :  'fn' ident ( ParamsList ) ':' Type StmtBlock 
 
 StmtBlock : '{' VariableDeclList StmtList '}'
 
