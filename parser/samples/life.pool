@@ -1,20 +1,16 @@
-life Cow inherit Animal hunts Cat, Dog implements Tigger, Lion {
-  let height : usize;
-  let f1: f32;
-  let isSpotted: bool;
-  fn Moo() -> void {
-    println!( this.height, " ", isSpotted, "\n" );
+life Animal {
+  let name: string;
+}
+
+// 鱼声明类型的声明
+life Fish inherit Animal hunts Shrimp {
+  let size: usize;
+  fn swim() -> void {
+    println!("swimming!");
   }
 }
 
-fn main() -> void {
-  let betsy: Cow;
-  betsy = spawn(Cow);
-  betsy.Moo();
-}
-
-fn add(a: usize, b: usize) -> usize {
-  let ret: usize;
-  ret = a + b;
-  return ret;
+// 虾声明类型的声明
+life Shrimp inherit Animal {
+  let lenght: f32;
 }

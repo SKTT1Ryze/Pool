@@ -256,16 +256,16 @@ FunctionDecl  : T_Fn T_Identifier '(' ParamsList ')' T_FuncReturn Type StmtBlock
 // 生命类型声明产生式
 LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               {
-                // 普通类声明
+                // 普通生命声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL,
-                                    NULL,
+                                    new List< NamedType* >(),
                                     new List< NamedType* >(), 
                                     $4);
               }
             | T_Life T_Identifier T_Hunts InterfaceList '{' FieldList '}'
               {
-                // 普通类声明，有捕食关系
+                // 生命声明，有捕食关系
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL,
                                     $4,
@@ -274,16 +274,16 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               }
             | T_Life T_Identifier T_Inherit T_Identifier '{' FieldList '}'
               {
-                // 继承接口的类声明
+                // 继承接口的生命声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
-                                    NULL,
+                                    new List< NamedType* >(),
                                     new List< NamedType* >(), 
                                     $6);
               }
             | T_Life T_Identifier T_Inherit T_Identifier T_Hunts InterfaceList '{' FieldList '}'
               {
-                // 继承接口的类声明，有捕食关系
+                // 继承接口的生命声明，有捕食关系
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     $6,
@@ -292,16 +292,16 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               }
             | T_Life T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
-                // 实现接口的类声明
+                // 实现接口的生命声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL, 
-                                    NULL,
+                                    new List< NamedType* >(),
                                     $4, 
                                     $6);
               }
             | T_Life T_Identifier T_Hunts InterfaceList T_Implements InterfaceList '{' FieldList '}'
               {
-                // 实现接口的类声明，有捕食关系
+                // 实现接口的生命声明，有捕食关系
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL, 
                                     $4,
@@ -310,16 +310,16 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               }
             | T_Life T_Identifier T_Inherit T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
-                // 既继承接口又实现接口的类声明
+                // 既继承接口又实现接口的生命声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
-                                    NULL,
+                                    new List< NamedType* >(),
                                     $6, 
                                     $8);
               }
             | T_Life T_Identifier T_Inherit T_Identifier T_Hunts InterfaceList T_Implements InterfaceList '{' FieldList '}'
               {
-                // 既继承接口又实现接口的类声明，有捕食关系
+                // 既继承接口又实现接口的生命声明，有捕食关系
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
                                     $6,

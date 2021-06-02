@@ -77,8 +77,14 @@ template<class Element> class List {
         { for (int i = 0; i < NumElements(); i++)
              Nth(i)->SetParent(p); }
     void PrintAll(int indentLevel, const char *label = NULL)
-        { for (int i = 0; i < NumElements(); i++)
-             Nth(i)->Print(indentLevel, label); }
+        {
+            for (int i = 0; i < NumElements(); i++) {
+                if(Nth(i) != NULL) {
+                    Nth(i)->Print(indentLevel, label);
+                }
+            }
+        }
+             
              
 
 };
