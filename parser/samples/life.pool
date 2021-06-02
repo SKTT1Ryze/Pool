@@ -2,13 +2,19 @@ life Cow {
   let height : usize;
   let f1: f32;
   let isSpotted: bool;
-  fn Moo(): void {
+  fn Moo() -> void {
     println!( this.height, " ", isSpotted, "\n" );
   }
 }
 
-fn main(): void {
+fn main() -> void {
   let betsy: Cow;
   betsy = spawn(Cow);
   betsy.Moo();
+}
+
+fn add(a: usize, b: usize) -> usize {
+  let ret: usize;
+  ret = a + b;
+  return ret;
 }

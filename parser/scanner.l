@@ -112,6 +112,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "string"            { return T_String;      }
 "null"              { return T_Null;        }
 "extends"           { return T_Extends;     }
+"inherit"           { return T_Inherit;     }
 "this"              { return T_This;        }
 "interface"         { return T_Interface;   }
 "implements"        { return T_Implements;  }

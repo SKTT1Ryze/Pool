@@ -78,7 +78,7 @@ void yyerror(char *msg); // standard error-handling routine
  */
 %token   T_Void T_Bool T_String
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
-%token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
+%token   T_And T_Or T_Null T_Extends T_Inherit T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Println T_ReadInteger T_ReadLine
 %token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_Fn T_FuncReturn T_In T_Continue T_Const T_Loop T_Colon
@@ -245,7 +245,7 @@ Param : Variable              { $$ = $1; }
       ;
 
 // 函数声明产生式
-FunctionDecl  : T_Fn T_Identifier '(' ParamsList ')' T_Colon Type StmtBlock {
+FunctionDecl  : T_Fn T_Identifier '(' ParamsList ')' T_FuncReturn Type StmtBlock {
                                               Identifier* functionName = new Identifier(@2, $2);
                                               $$ = new FnDecl(functionName, $7, $4);
                                               $$->SetFunctionBody($8); /* 设置函数体 */
