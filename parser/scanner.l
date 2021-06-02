@@ -111,8 +111,8 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "bool"              { return T_Bool;        }
 "string"            { return T_String;      }
 "null"              { return T_Null;        }
-"extends"           { return T_Extends;     }
 "inherit"           { return T_Inherit;     }
+"hunts"             { return T_Hunts;       }
 "this"              { return T_This;        }
 "interface"         { return T_Interface;   }
 "implements"        { return T_Implements;  }
@@ -127,8 +127,6 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "println!"          { return T_Println;       }
 "ReadInteger"       { return T_ReadInteger; }
 "ReadLine"          { return T_ReadLine;    }
-
- /* ---------下面是池语言特有的关键字----------- */
 "Pool"               { return T_Pool; }
 "life"               { return T_Life; }
 "spawn"              { return T_Spawn; }

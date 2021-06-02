@@ -44,27 +44,30 @@ class ClassDecl : public Decl
 {
   protected:
     List<Decl*> *members;
-    NamedType *extends;
+    NamedType *inherit;
     List<NamedType*> *implements;
 
   public:
     // 类名字，继承的接口，实现的接口，内部成员
-    ClassDecl(Identifier *name, NamedType *extends, 
+    ClassDecl(Identifier *name, NamedType *inherit, 
               List<NamedType*> *implements, List<Decl*> *members);
     const char *GetPrintNameForNode() { return "ClassDecl"; }
     void PrintChildren(int indentLevel);
 };
 
-// 池声明
+// 声明类型声明
 class LifeDecl : public Decl
 {
   protected:
     List<Decl*> *members;
-    NamedType *extends;
+    // 继承的声明类型
+    NamedType *inherit;
+    // 捕食的声明类型
+    List<NamedType*> *hunts;
     List<NamedType*> *implements;
   public:
     // 池名字，继承的接口，实现的接口，内部成员
-    LifeDecl(Identifier *name, NamedType *extends, 
+    LifeDecl(Identifier *name, NamedType *inherit, List<NamedType*> *hunts,
               List<NamedType*> *implements, List<Decl*> *members);
     const char *GetPrintNameForNode() { return "LifeDecl"; }
     void PrintChildren(int indentLevel);

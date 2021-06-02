@@ -1,4 +1,4 @@
-life Cow {
+life Cow inherit Animal hunts Cat, Dog implements Tigger, Lion {
   let height : usize;
   let f1: f32;
   let isSpotted: bool;

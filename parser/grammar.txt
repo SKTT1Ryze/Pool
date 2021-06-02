@@ -52,7 +52,7 @@ Stmt : <Expr>;
 
 
 
-LifeDecl ::= life ident <extends ident> <implements ident+ ,> { Field∗ }
+LifeDecl ::= life ident <inherit ident> <implements ident+ ,> { Field∗ }
 Field ::= VariableDecl | FunctionDecl
 
 IfStmt ::= if ( Expr ) Stmt <else Stmt>

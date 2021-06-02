@@ -23,34 +23,36 @@ void VarDecl::PrintChildren(int indentLevel) {
    id->Print(indentLevel+1);
 }
 
-ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
-    // extends can be NULL, impl & mem may be empty lists but cannot be NULL
+ClassDecl::ClassDecl(Identifier *n, NamedType *ex,  List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
+    // inherit can be NULL, impl & mem may be empty lists but cannot be NULL
     Assert(n != NULL && imp != NULL && m != NULL);     
-    extends = ex;
-    if (extends) extends->SetParent(this);
+    inherit = ex;
+    if (inherit) inherit->SetParent(this);
     (implements=imp)->SetParentAll(this);
     (members=m)->SetParentAll(this);
 }
 
 void ClassDecl::PrintChildren(int indentLevel) {
     id->Print(indentLevel+1);
-    if (extends) extends->Print(indentLevel+1, "(extends) ");
+    if (inherit) inherit->Print(indentLevel+1, "(inherit) ");
     implements->PrintAll(indentLevel+1, "(implements) ");
     members->PrintAll(indentLevel+1);
 }
 
-LifeDecl::LifeDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
-    // extends can be NULL, impl & mem may be empty lists but cannot be NULL
+LifeDecl::LifeDecl(Identifier *n, NamedType *ex, List<NamedType*> *hs, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
+    // inherit can be NULL, impl & mem may be empty lists but cannot be NULL
     Assert(n != NULL && imp != NULL && m != NULL);     
-    extends = ex;
-    if (extends) extends->SetParent(this);
+    inherit = ex;
+    if (inherit) inherit->SetParent(this);
+    (hunts=hs)->SetParentAll(this);
     (implements=imp)->SetParentAll(this);
     (members=m)->SetParentAll(this);
 }
 
 void LifeDecl::PrintChildren(int indentLevel) {
     id->Print(indentLevel+1);
-    if (extends) extends->Print(indentLevel+1, "(extends) ");
+    if (inherit) inherit->Print(indentLevel+1, "(inherit) ");
+    hunts->PrintAll(indentLevel+1, "(hunts) ");
     implements->PrintAll(indentLevel+1, "(implements) ");
     members->PrintAll(indentLevel+1);
 }

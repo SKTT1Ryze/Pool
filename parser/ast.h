@@ -40,7 +40,7 @@ class Node
   protected:
     yyltype *location;
     Node    *parent;
-
+    
   public:
     Node(yyltype loc);
     Node();

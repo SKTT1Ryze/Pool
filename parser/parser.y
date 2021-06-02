@@ -78,7 +78,7 @@ void yyerror(char *msg); // standard error-handling routine
  */
 %token   T_Void T_Bool T_String
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
-%token   T_And T_Or T_Null T_Extends T_Inherit T_This T_Interface T_Implements
+%token   T_And T_Or T_Null T_Inherit T_Hunts T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Println T_ReadInteger T_ReadLine
 %token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_Fn T_FuncReturn T_In T_Continue T_Const T_Loop T_Colon
@@ -258,33 +258,73 @@ LifeDecl   : T_Life T_Identifier '{' FieldList '}'
               {
                 // 普通类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
-                                    NULL, 
+                                    NULL,
+                                    NULL,
                                     new List< NamedType* >(), 
                                     $4);
               }
-            | T_Life T_Identifier T_Extends T_Identifier '{' FieldList '}'
+            | T_Life T_Identifier T_Hunts InterfaceList '{' FieldList '}'
+              {
+                // 普通类声明，有捕食关系
+                $$ = new LifeDecl(new Identifier(@2, $2), 
+                                    NULL,
+                                    $4,
+                                    new List< NamedType* >(), 
+                                    $6);
+              }
+            | T_Life T_Identifier T_Inherit T_Identifier '{' FieldList '}'
               {
                 // 继承接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
+                                    NULL,
                                     new List< NamedType* >(), 
                                     $6);
+              }
+            | T_Life T_Identifier T_Inherit T_Identifier T_Hunts InterfaceList '{' FieldList '}'
+              {
+                // 继承接口的类声明，有捕食关系
+                $$ = new LifeDecl(new Identifier(@2, $2), 
+                                    new NamedType(new Identifier(@4, $4)), 
+                                    $6,
+                                    new List< NamedType* >(), 
+                                    $8);
               }
             | T_Life T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 实现接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     NULL, 
+                                    NULL,
                                     $4, 
                                     $6);
               }
-            | T_Life T_Identifier T_Extends T_Identifier T_Implements InterfaceList '{' FieldList '}'
+            | T_Life T_Identifier T_Hunts InterfaceList T_Implements InterfaceList '{' FieldList '}'
+              {
+                // 实现接口的类声明，有捕食关系
+                $$ = new LifeDecl(new Identifier(@2, $2), 
+                                    NULL, 
+                                    $4,
+                                    $6, 
+                                    $8);
+              }
+            | T_Life T_Identifier T_Inherit T_Identifier T_Implements InterfaceList '{' FieldList '}'
               {
                 // 既继承接口又实现接口的类声明
                 $$ = new LifeDecl(new Identifier(@2, $2), 
                                     new NamedType(new Identifier(@4, $4)), 
+                                    NULL,
                                     $6, 
                                     $8);
+              }
+            | T_Life T_Identifier T_Inherit T_Identifier T_Hunts InterfaceList T_Implements InterfaceList '{' FieldList '}'
+              {
+                // 既继承接口又实现接口的类声明，有捕食关系
+                $$ = new LifeDecl(new Identifier(@2, $2), 
+                                    new NamedType(new Identifier(@4, $4)), 
+                                    $6,
+                                    $8, 
+                                    $10);
               }
             ;
 
