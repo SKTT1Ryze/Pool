@@ -82,7 +82,7 @@ void yyerror(char *msg); // standard error-handling routine
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
 %token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
-%token   T_Life T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
+%token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_FuncReturn T_In T_Continue T_Const T_Loop
 
 /*标识符*/
 %token   <identifier> T_Identifier
@@ -420,6 +420,10 @@ Expr  : LValue '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="
       | T_New '(' T_Identifier ')' { 
                                     NamedType* newt = new NamedType(new Identifier(@3, $3));
                                     $$ = new NewExpr(@1, newt);
+                                  }
+      | T_Spawn '(' T_Identifier ')' { 
+                                    NamedType* newt = new NamedType(new Identifier(@3, $3));
+                                    $$ = new SpawnExpr(@1, newt);
                                   }
       | T_NewArray '(' Expr ',' Type ')' { $$ = new NewArrayExpr(@1, $3, $5);  }
       ;

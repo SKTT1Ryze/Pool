@@ -232,6 +232,19 @@ class NewExpr : public Expr
     void PrintChildren(int indentLevel);
 };
 
+
+class SpawnExpr : public Expr
+{
+  protected:
+    NamedType *cType;
+    
+  public:
+    SpawnExpr(yyltype loc, NamedType *clsType);
+    const char *GetPrintNameForNode() { return "SpawnExpr"; }
+    void PrintChildren(int indentLevel);
+};
+
+
 class NewArrayExpr : public Expr
 {
   protected:

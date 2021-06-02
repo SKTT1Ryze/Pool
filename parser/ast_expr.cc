@@ -114,7 +114,16 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
   (cType=c)->SetParent(this);
 }
 
+SpawnExpr::SpawnExpr(yyltype loc, NamedType *c) : Expr(loc) { 
+  Assert(c != NULL);
+  (cType=c)->SetParent(this);
+}
+
 void NewExpr::PrintChildren(int indentLevel) {	
+    cType->Print(indentLevel+1);
+}
+
+void SpawnExpr::PrintChildren(int indentLevel) {	
     cType->Print(indentLevel+1);
 }
 
