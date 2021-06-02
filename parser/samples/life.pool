@@ -1,0 +1,14 @@
+life Cow {
+  usize height;
+  bool isSpotted;
+  void Moo() {
+    Print ( this.height, " ", isSpotted, "\n" );
+  }
+}
+
+
+void main() {
+  Cow betsy;
+  betsy = spawn(Cow);
+  betsy.Moo();
+}

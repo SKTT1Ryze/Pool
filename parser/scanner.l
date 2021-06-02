@@ -108,7 +108,6 @@ SINGLE_COMMENT    ("//"[^\n]*)
 
  /* --------------------- 关键字 ------------------------------- */
 "void"              { return T_Void;        }
-"int"               { return T_Int;         }
 "double"            { return T_Double;      }
 "bool"              { return T_Bool;        }
 "string"            { return T_String;      }
