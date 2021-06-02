@@ -77,7 +77,7 @@ void yyerror(char *msg); // standard error-handling routine
  * 终结符
  * 这些值会被生成到 y.tab.h 头文件里面去
  */
-%token   T_Void T_Bool T_Double T_String T_Class 
+%token   T_Void T_Bool T_String T_Class 
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims
 %token   T_And T_Or T_Null T_Extends T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break
@@ -202,7 +202,7 @@ Variable  :    Type T_Identifier  {
 
 /*类型的产生式*/
 Type      :    T_Usize        { $$ = Type::usizeType; /*Type 类型在 ast_type.h 里面定义*/}
-          |    T_Double       { $$ = Type::doubleType; }
+          |    T_F32       { $$ = Type::f32Type; }
           |    T_Bool         { $$ = Type::boolType; }
           |    T_String       { $$ = Type::stringType; }
           |    T_Void         { $$ = Type::voidType; }

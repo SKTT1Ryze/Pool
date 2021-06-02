@@ -19,7 +19,7 @@ class Type : public Node
     char *typeName;
 
   public :
-    static Type *usizeType, *doubleType, *boolType, *voidType,
+    static Type *usizeType, *f32Type, *boolType, *voidType,
                 *nullType, *stringType, *errorType;
 
     Type(yyltype loc) : Node(loc) {}

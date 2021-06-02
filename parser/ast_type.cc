@@ -15,8 +15,8 @@
  * creates lots of copies.
  */
 
-Type *Type::usizeType    = new Type("usize");
-Type *Type::doubleType = new Type("double");
+Type *Type::usizeType  = new Type("usize");
+Type *Type::f32Type = new Type("f32");
 Type *Type::voidType   = new Type("void");
 Type *Type::boolType   = new Type("bool");
 Type *Type::nullType   = new Type("null");
