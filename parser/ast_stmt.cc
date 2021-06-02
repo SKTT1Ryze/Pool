@@ -8,12 +8,12 @@
 #include "ast_expr.h"
 
 
-Program::Program(List<Decl*> *d) {
+Pool::Pool(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
 }
 
-void Program::PrintChildren(int indentLevel) {
+void Pool::PrintChildren(int indentLevel) {
     decls->PrintAll(indentLevel+1);
     printf("\n");
 }

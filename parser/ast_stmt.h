@@ -20,14 +20,14 @@ class Decl;
 class VarDecl;
 class Expr;
   
-class Program : public Node
+class Pool : public Node
 {
   protected:
      List<Decl*> *decls;
      
   public:
-     Program(List<Decl*> *declList);
-     const char *GetPrintNameForNode() { return "Program"; }
+     Pool(List<Decl*> *declList);
+     const char *GetPrintNameForNode() { return "Pool"; }
      void PrintChildren(int indentLevel);
 };
 

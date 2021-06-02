@@ -164,15 +164,15 @@ void yyerror(char *msg); // standard error-handling routine
  * 规约规则
  */
 /*总程序，由一系列定义的列表组成*/
-Program   :    DeclList            { 
+Pool   :    DeclList            { 
                                       @1; 
                                       /* pp2: The @1 is needed to convince 
                                        * yacc to set up yylloc. You can remove 
                                        * it once you have other uses of @n*/
-                                      Program *program = new Program($1);
+                                      Pool *pool = new Pool($1);
                                       // if no errors, advance to next phase
                                       if(ReportError::NumErrors() == 0) 
-                                        program->Print(0);
+                                        pool->Print(0);
                                     }
           ;
 
