@@ -279,4 +279,16 @@ class ReadLineExpr : public Expr
     ReadLineExpr(yyltype loc);
 };
 
+class PostfixExpr : public Expr
+{
+  protected:
+    LValue *lvalue;
+    Operator *optr;
+
+  public:
+    PostfixExpr(yyltype loc, LValue *lv, Operator *op);
+    void CheckStatements();
+    Type *GetType() { if (lvalue) return lvalue->GetType(); else return NULL; }
+    const char *GetTypeName() { if (lvalue) return lvalue->GetTypeName(); else return NULL; }
+};
 #endif

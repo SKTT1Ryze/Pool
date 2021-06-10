@@ -3,7 +3,7 @@ life Animal {
 }
 
 // 鱼声明类型的声明
-life Fish inherit Animal hunts Shrimp implements Swim {
+life Fish inherit Animal implements Swim {
   let size: usize;
   fn swim() -> void {
     println!("swimming!");

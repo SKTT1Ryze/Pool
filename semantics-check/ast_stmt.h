@@ -20,6 +20,7 @@
 class Decl;
 class VarDecl;
 class Expr;
+class IntConstant;
   
 class Pool : public Node
 {
@@ -129,5 +130,37 @@ class PrintStmt : public Stmt
     void CheckStatements();
 };
 
+class DefaultStmt : public Stmt
+{
+  protected:
+    List<Stmt*> *stmts;
 
+  public:
+    DefaultStmt(List<Stmt*> *sts);
+    void CheckStatements();
+    void CheckDeclError();
+};
+
+
+class CaseStmt : public DefaultStmt
+{
+  protected:
+    IntConstant *intconst;
+
+  public:
+    CaseStmt(IntConstant *ic, List<Stmt*> *sts);
+};
+
+class SwitchStmt : public Stmt
+{
+  protected:
+    Expr *expr;
+    List<CaseStmt*> *cases;
+    DefaultStmt *defaults;
+
+  public:
+    SwitchStmt(Expr *e, List<CaseStmt*> *cs, DefaultStmt *ds);
+    void CheckStatements();
+    void CheckDeclError();
+};
 #endif

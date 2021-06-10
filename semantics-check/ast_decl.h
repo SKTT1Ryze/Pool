@@ -14,10 +14,9 @@
 #include "ast_type.h"
 #include "hashtable.h"
 
-class Type;
-class NamedType;
+
 class Identifier;
-class Stmt;
+class StmtBlock;
 
 // 所有定义的父类
 class Decl : public Node 
@@ -68,6 +67,9 @@ class ClassDecl : public Decl
     Hashtable<Decl*> *GetSymTable() { return sym_table; }
 };
 
+
+
+
 // 声明类型声明
 class LifeDecl : public Decl
 {
@@ -81,7 +83,7 @@ class LifeDecl : public Decl
     Hashtable<Decl*> *sym_table;
   public:
     // 池名字，继承的接口，实现的接口，内部成员
-    LifeDecl(Identifier *name, NamedType *inherit, List<NamedType*> *hunts,
+    LifeDecl(Identifier *name, NamedType *inherit,
               List<NamedType*> *implements, List<Decl*> *members);
     NamedType *GetExtends() { return inherit; }
     List<NamedType*> *GetImplements() { return implements; }
@@ -112,7 +114,7 @@ class FnDecl : public Decl
   protected:
     List<VarDecl*> *formals;
     Type *returnType;
-    Stmt *body;
+    StmtBlock *body;
     Hashtable<Decl*> *sym_table;
 
   // 函数名字，返回值类型，参数列表

@@ -242,7 +242,7 @@ bool ClassDecl::IsCompatibleWith(Decl *decl)
   return false;
 }
 
-LifeDecl::LifeDecl(Identifier *n, NamedType *ex, List<NamedType*> *hs, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
+LifeDecl::LifeDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
     // extends can be NULL, impl & mem may be empty lists but cannot be NULL
     Assert(n != NULL && imp != NULL && m != NULL);     
     this->inherit = ex;
@@ -392,7 +392,7 @@ void LifeDecl::CheckDeclError() {
 // A and B are not of the same class type
 // A->IsCompatible(B)
 // A is compatible with B if A is a B
-bool ClassDecl::IsCompatibleWith(Decl *decl)
+bool LifeDecl::IsCompatibleWith(Decl *decl)
 {
   NamedType *extends = this->GetExtends();
   List<NamedType*> *implements = this->GetImplements();

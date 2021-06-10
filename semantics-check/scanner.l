@@ -1,132 +1,117 @@
 /* File:  scanner.l
  * ----------------
- * Lex inupt file to generate the scanner for the compiler.
+ * Lex input file to generate the scanner
  */
 
 %{
 
+/* The text within this first region delimited by %{ and %} is assumed to
+ * be C/C++ code and will be copied verbatim to the lex.yy.c file ahead
+ * of the definitions of the yylex() function. Add other header file inclusions
+ * or C++ variable declarations/prototypes that are needed by your code here.
+ */
+
 #include <string.h>
+#include <ctype.h>
 #include "scanner.h"
 #include "utility.h" // for PrintDebug()
 #include "errors.h"
 #include "parser.h" // for token codes, yylval
 #include "list.h"
 
-#define TAB_SIZE 8
-
-/* Global variables
- * ----------------
- * (For shame!) But we need a few to keep track of things that are
- * preserved between calls to yylex or used outside the scanner.
+/* Macro: YY_USER_ACTION 
+ * ---------------------
+ * This flex built-in macro can be defined to provide an action which is
+ * always executed prior to any matched rule's action. Basically, it is
+ * a way of having a piece of code common to all actions factored out to
+ * this routine.  We already defined it for you and left the empty
+ * function DoBeforeEachAction ready for your use as needed. It will
+ * be called once for each pattern scanned from the file, before
+ * executing its action.
  */
-static int curLineNum, curColNum;
-List<char*> savedLines;
-
 static void DoBeforeEachAction(); 
 #define YY_USER_ACTION DoBeforeEachAction();
 
+#define TAB_SIZE 8
+
+int lineno, colno;
+List<const char*> savedlines;
 %}
 
-/* States
- * ------
- * A little wrinkle on states is the COPY exclusive state which
- * I added to first match each line and copy it ot the list of lines
- * read before re-processing it. This allows us to print the entire
- * line later to provide context on errors.
- * todo: 理解这里
- */
+ /* The section before the first %% is the Definitions section of the lex
+  * input file. Here is where you set options for the scanner, define lex
+  * states, and can set up definitions to give names to regular expressions
+  * as a simple substitution mechanism that allows for more readable
+  * entries in the Rules section later. 
+  */
+PUNCTUATION        ([!:;,.[\]{}()])
+ARITHMETIC         ([-+/*%])
+RELATIONAL         ([<>=])
+OPERATOR           ({ARITHMETIC}|{RELATIONAL})
+DECIMAL            ([0-9]+)
+HEXADECIMAL        (0[xX][0-9a-fA-F]+)
+BEG_STRING         (\"[^"\n]*)
+STRING             ({BEG_STRING}\")
+BOOLEAN            (true|false)   
+INTEGER            ({DECIMAL}|{HEXADECIMAL})   
+FLOAT              ({DECIMAL}\.{DECIMAL}?((E|e)(\+|\-)?{DECIMAL})?)
+IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
+SINGLE_COMMENT     ("//"[^\n]*)
+BEG_COMMENT        ("/*")
+END_COMMENT        ("*/")
 
-/*初始状态*/
-%s N
-/*
- * %x 是状态定义
- * 这里定义了两个状态
- */
-%x COPY COMM
+%x COPY COMMENT
 %option stack
 
-/*十进制数字*/
-DIGIT             ([0-9])
-/*十六进制数字*/
-HEX_DIGIT         ([0-9a-fA-F])
-/*十六进制整形*/
-HEX_INTEGER       (0[Xx]{HEX_DIGIT}+)
-/*整形*/
-INTEGER           ({DIGIT}+)
-/*指数*/
-EXPONENT          ([Ee][-+]?{INTEGER})
-/*浮点数*/
-DOUBLE            ({INTEGER}"."{DIGIT}*{EXPONENT}?)
-/*没闭合的字符串*/
-BEG_STRING        (\"[^"\n]*)
-/*闭合的字符串*/
-STRING            ({BEG_STRING}\")
-/*标识符*/
-IDENTIFIER        ([_a-zA-Z][a-zA-Z_0-9]*)
-/*运算符*/
-OPERATOR          ([-+/*%=.,;!<>()[\]{}])
-/*块注释开头*/
-BEG_COMMENT       ("/*")
-/*块注释结尾*/
-END_COMMENT       ("*/")
-/*单行注释*/
-SINGLE_COMMENT    ("//"[^\n]*)
+%%             /* BEGIN RULES SECTION */
+ /* All patterns and actions should be placed between the start and stop
+  * %% markers which delimit the Rules section. 
+  */ 
 
+<COPY>.*                 { 
+                           savedlines.Append(strdup(yytext));
+                           colno = 1;
+                           yy_pop_state();
+                           yyless(0);
+                         }
+<COPY><<EOF>>            { yy_pop_state(); }
+<*>([\r]?\n)             { 
+                           colno = 1; lineno++;
+                           if (YYSTATE == COPY)
+                             savedlines.Append("");
+                           else 
+                             yy_push_state(COPY);
+                         }
 
-/* 词法规则定义 */
-%%             
+<*>[\t]                  { colno += TAB_SIZE - colno % TAB_SIZE + 1; }
+[ ]+                     ;
 
-<COPY>.*                { 
-                           char curLine[512];
-                            //strncpy(curLine, yytext, sizeof(curLine));
-                           savedLines.Append(strdup(yytext)); // strdup函数：分配空间，复制字符串，返回地址
-                           curColNum = 1; /*行数自增*/
-                           yy_pop_state(); /*从栈出弹出下一个状态成为当前状态*/
-                           yyless(0); /*重新放入输入流*/
-                        }
-
-<COPY><<EOF>>           { yy_pop_state(); }
-
-<*>([\r]?\n)                   { 
-                           curLineNum++;
-                           curColNum = 1;
-                           if (YYSTATE == COPY) savedLines.Append("");
-                           else yy_push_state(COPY);
-                        }
-
-[ ]+                    { /* 跳过所有空格 */  }
-
-<*>[\t]                 { curColNum += TAB_SIZE - curColNum%TAB_SIZE + 1; }
-
- /* -------------------- 注释 ----------------------------- */
-{BEG_COMMENT}           { BEGIN(COMM); /*进入块注释状态*/}
-<COMM>{END_COMMENT}     { BEGIN(N); /*结束块注释状态，进入默认状态*/}
-<COMM><<EOF>>           { ReportError::UntermComment(); return 0; /*块注释没闭合，错误*/ }
-<COMM>.                 { /* 跳过 */ }
-{SINGLE_COMMENT}        { /* 跳过单行注释 */ }
-
-
- /* --------------------- 关键字 ------------------------------- */
-"void"              { return T_Void;        }
-"bool"              { return T_Bool;        }
-"string"            { return T_String;      }
-"null"              { return T_Null;        }
-"inherit"           { return T_Inherit;     }
-"hunts"             { return T_Hunts;       }
-"this"              { return T_This;        }
-"interface"         { return T_Interface;   }
-"implements"        { return T_Implements;  }
-"while"             { return T_While;       }
-"for"               { return T_For;         }
-"if"                { return T_If;          }
-"else"              { return T_Else;        }
-"return"            { return T_Return;      }
-"break"             { return T_Break;       }
-"New"               { return T_New;         }
-"NewArray"          { return T_NewArray;    }
-"println!"          { return T_Println;       }
-"ReadInteger"       { return T_ReadInteger; }
-"ReadLine"          { return T_ReadLine;    }
+ /* recognize all keywords and return the correct token from scanner.h */
+"void"                   { return T_Void; }
+"int"                    { return T_Usize; }
+"double"                 { return T_F32; }
+"bool"                   { return T_Bool; }
+"string"                 { return T_String; }
+"class"                  { return T_Class; }
+"interface"              { return T_Interface; }
+"null"                   { return T_Null; }
+"this"                   { return T_This; }
+"inherit"                { return T_Inherit; }
+"implements"             { return T_Implements; }
+"for"                    { return T_For; }
+"while"                  { return T_While; }
+"if"                     { return T_If; }
+"else"                   { return T_Else; }
+"return"                 { return T_Return; }
+"break"                  { return T_Break; }
+"switch"                 { return T_Switch; }
+"case"                   { return T_Case; }
+"default"                { return T_Default; }
+"new"                    { return T_New; }
+"NewArray"               { return T_NewArray; }
+"Print"                  { return T_Print; }
+"ReadInteger"            { return T_ReadInteger; }
+"ReadLine"               { return T_ReadLine; }
 "Pool"               { return T_Pool; }
 "life"               { return T_Life; }
 "spawn"              { return T_Spawn; }
@@ -140,49 +125,93 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "const"				   { return T_Const; }
 "loop"				   { return T_Loop; }
 ":"                  { return T_Colon; }
+ 
+
+ /* recognize punctuation and single-char operators 
+  * and return the ASCII value as the token 
+  */
+{PUNCTUATION} |
+{OPERATOR}               { return yytext[0]; }
 
 
+ /* recognize two-character operators and return the correct token */
+"<="                     { return T_LessEqual; }
+">="                     { return T_GreaterEqual; }
+"=="                     { return T_Equal; }
+"!="                     { return T_NotEqual; }
+"[]"                     { return T_Dims; }
+"&&"                     { return T_And; }
+"||"                     { return T_Or; }
+"++"                     { return T_Increment; }
+"--"                     { return T_Decrement; }
 
- /* -------------------- 操作符 ----------------------------- */
-"<="                { return T_LessEqual;   }
-">="                { return T_GreaterEqual;}
-"=="                { return T_Equal;       }
-"!="                { return T_NotEqual;    }
-"&&"                { return T_And;         }
-"||"                { return T_Or;          }
-{OPERATOR}          { return yytext[0];     }
-    
-"[]"                { return T_Dims;        }
+ /* recognize int, double, bool and string constants,
+  * return the correct token
+  * and set appropriate filed of yylval 
+  */
+{STRING}                 { 
+                           yylval.stringConstant = strdup(yytext);
+                           return T_StringConstant;
+                         }
+{BEG_STRING}             {
+                          ReportError::UntermString(&yylloc, yytext);       
+                         }
+{BOOLEAN}                { 
+                           if (strcmp("true", yytext) == 0)
+                               yylval.boolConstant = true;
+                           else
+			       yylval.boolConstant = false;
+                           return T_BoolConstant;
+                         }
+{DECIMAL}                { 
+                           yylval.integerConstant = strtol(yytext, NULL, 10); return T_IntConstant; 
+			 }
+{HEXADECIMAL}            {
+                          yylval.integerConstant = strtol(yytext, NULL, 16); 
+			  return T_IntConstant;
+                         }
+{FLOAT}                  { 
+                           yylval.doubleConstant = atof(yytext); return T_DoubleConstant; 
+			 }
 
- /* -------------------- 常量 ------------------------------ */
-"true"|"false"      { yylval.boolConstant = (yytext[0] == 't'); // yylval 在 parser.y 里面定义
-                         return T_BoolConstant; }
-{INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10); // strtol: 将字符串转换为 long 类型，第三个参数指定进制
-                         return T_IntConstant; }
-{HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, NULL, 16);
-                         return T_IntConstant; }
-{DOUBLE}            { yylval.doubleConstant = atof(yytext); // atof: 将字符串转换成 double
-                         return T_DoubleConstant; }
-{STRING}            { yylval.stringConstant = strdup(yytext); 
-                         return T_StringConstant; }
-{BEG_STRING}        { ReportError::UntermString(&yylloc, yytext); 
-                        /*没闭合的字符串*/ 
-                    }
+ /* recognize identifiers, 
+  * return the correct token and set appropriate fields of yylval 
+  */
+{IDENTIFIER}             { 
+                          if (yyleng > MaxIdentLen)
+        	            ReportError::LongIdentifier(&yylloc, yytext);
+			  strncpy(yylval.identifier, yytext, MaxIdentLen);
+			  yylval.identifier[MaxIdentLen] = '\0';   
+			  
+			  return T_Identifier;
+		        }
+
+ /* consume single-line comment */
+{SINGLE_COMMENT}      ;
 
 
- /* -------------------- 标识符 --------------------------- */
-{IDENTIFIER}         {
-                        if (strlen(yytext) > MaxIdentLen) ReportError::LongIdentifier(&yylloc, yytext);
-                        strncpy(yylval.identifier, yytext, MaxIdentLen); // strncpy: 复制字符串的前 n 个字符
-                        yylval.identifier[MaxIdentLen] = '\0'; // todo: 这里的逻辑有点不清楚
-                        return T_Identifier;
-                     }
+ /* consume multi-line comments 
+  * report unterminated comment
+  */
 
-
- /* -------------------- 错误 -------------------- */
-.                   { ReportError::UnrecogChar(&yylloc, yytext[0]); }
+{BEG_COMMENT}           { BEGIN COMMENT; }
+<COMMENT>.              ;
+<COMMENT>{END_COMMENT}  { BEGIN INITIAL; }
+<COMMENT><<EOF>>        { 
+			  ReportError::UntermComment();
+			  BEGIN INITIAL;
+			}
+ /* all other characters are reported as errors */
+.                       { 
+                          ReportError::UnrecogChar(&yylloc, yytext[0]);     
+			}
 
 %%
+/* The closing %% above marks the end of the Rules section and the beginning
+ * of the User Subroutines section. All text from here to the end of the
+ * file is copied verbatim to the end of the generated lex.yy.c file.
+ * This section is where you put definitions of helper functions.
+ */
 
 
 /* Function: InitScanner
@@ -196,16 +225,14 @@ SINGLE_COMMENT    ("//"[^\n]*)
  * is printed. Setting it to true will give you a running trail that might
  * be helpful when debugging your scanner. Please be sure the variable is
  * set to false when submitting your final version.
- * 任意时候调用 yylex() 之前都会调用这个函数
  */
 void InitScanner()
 {
     PrintDebug("lex", "Initializing scanner");
-    yy_flex_debug = false; // 这里初始化是否打印调试信息
-    BEGIN(N);
-    yy_push_state(COPY); // copy first line at start
-    curLineNum = 1;
-    curColNum = 1;
+    yy_flex_debug = false;
+    yy_push_state(COPY);
+    lineno = 1;
+    colno = 1;
 }
 
 
@@ -213,30 +240,28 @@ void InitScanner()
  * ------------------------------
  * This function is installed as the YY_USER_ACTION. This is a place
  * to group code common to all actions.
- * On each match, we fill in the fields to record its location and
- * update our column counter.
- * 记录代码扫描位置
  */
 static void DoBeforeEachAction()
 {
-   yylloc.first_line = curLineNum; // yylloc 是位置信息，会反馈给 bison
-   yylloc.first_column = curColNum;
-   yylloc.last_column = curColNum + yyleng - 1;
-   curColNum += yyleng;
+  yylloc.first_line = yylloc.last_line = lineno;
+
+  yylloc.first_column = colno;
+  yylloc.last_column = colno + yyleng - 1;
+  colno = colno + yyleng;
 }
 
-/* Function: GetLineNumbered()
+/* Function: GetLinenumbered()
  * ---------------------------
  * Returns string with contents of line numbered n or NULL if the
- * contents of that line are not available.  Our scanner copies
+ * contents of that line are not available. Our scanner copies
  * each line scanned and appends each to a list so we can later
  * retrieve them to report the context for errors.
- * 返回给定行号的代码
- * scanner 复制了一份源码保存在 savedLines 中
  */
-const char *GetLineNumbered(int num) {
-   if (num <= 0 || num > savedLines.NumElements()) return NULL;
-   return savedLines.Nth(num-1); 
-}
+const char *GetLineNumbered(int num) 
+{
+  if (num <= 0 || num > savedlines.NumElements())
+    return NULL;
 
+  return savedlines.Nth(num - 1);
+}
 
