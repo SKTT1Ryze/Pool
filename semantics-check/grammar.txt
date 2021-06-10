@@ -1,0 +1,96 @@
+Pool : DeclList
+
+DeclList : DeclList Decl
+	     | Decl
+
+Decl : VariableDecl 
+     | FunctionDecl 
+     | LifeDecl 
+     | InterfaceDecl
+
+VariableDecl : 'let' Variable ';'
+
+Variable : ident ':' Type
+
+Type : usize 
+	 | 'f32'
+	 | 'bool'
+	 | 'string'
+	 | 'void'
+	 | ident 
+	 | Type[]
+
+
+
+InterfaceDecl : 'interface' ident '{' PrototypeList '}'
+
+PrototypeList : Prototype PrototypeList
+			  | EPSILON
+
+Prototype : Type ident ( ParamsList ) ; | EPSILON
+
+ParamsList : Param AParam
+		   | EPSILON
+
+AParam : ',' Param AParam
+       | EPSILON
+
+
+
+FunctionDecl :  'fn' ident ( ParamsList ) ':' Type StmtBlock 
+
+StmtBlock : '{' VariableDeclList StmtList '}'
+
+VariableDeclList : VariableDecl VariableDeclList
+                 | EPSILON
+
+StmtList : Stmt StmtList
+         | EPSLION
+
+Stmt : <Expr>; 
+				| IfStmt | WhileStmt | ForStmt | BreakStmt | ReturnStmt | PrintStmt | StmtBlock
+
+
+
+LifeDecl ::= life ident <inherit ident> <hunts ident+ ,> <implements ident+ ,> { Field∗ }
+Field ::= VariableDecl | FunctionDecl
+
+IfStmt ::= if ( Expr ) Stmt <else Stmt>
+WhileStmt  while ( Expr ) Stmt
+ForStmt ::= for ( <Expr>; Expr ; <Expr>) Stmt
+
+ReturnStmt 	: 'return' Expr ';'
+						| 'return' ';'
+
+BreakStmt ::= break ;
+PrintStmt ::= Print ( Expr+ , ) ;
+Expr ::= LValue = Expr 
+					| Constant 
+					| LValue 
+					| this 
+					| Call 
+					| ( Expr ) 
+					| Expr + Expr 
+					| Expr - Expr 
+					| Expr * Expr 
+					| Expr / Expr 
+					| Expr % Expr 
+					| - Expr 
+					| Expr < Expr 
+					| Expr <= Expr 
+					| Expr > Expr 
+					| Expr >= Expr 
+					| Expr == Expr 
+					| Expr != Expr 
+					| Expr && Expr 
+					| Expr || Expr 
+					| ! Expr 
+					| ReadInteger ( ) | ReadLine ( ) | New ( ident ) | NewArray ( Expr , Type )
+LValue ::= ident | Expr . ident | Expr [ Expr ]
+Call ::= ident ( Actuals ) | Expr . ident ( Actuals )
+Actuals ::= Expr+ , |
+Constant 	: intConstant 
+					| doubleConstant
+					| boolConstant
+					| stringConstant
+					| null
