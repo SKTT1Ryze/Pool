@@ -109,7 +109,7 @@ END_COMMENT        ("*/")
 "default"                { return T_Default; }
 "new"                    { return T_New; }
 "NewArray"               { return T_NewArray; }
-"Print"                  { return T_Print; }
+"println!"               { return T_Println;       }
 "ReadInteger"            { return T_ReadInteger; }
 "ReadLine"               { return T_ReadLine; }
 "Pool"               { return T_Pool; }

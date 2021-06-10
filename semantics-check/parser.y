@@ -110,7 +110,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims T_Increment T_Decrement
 %token   T_And T_Or T_Null T_Inherit T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break T_Switch T_Case T_Default
-%token   T_New T_NewArray T_Print T_ReadInteger T_ReadLine
+%token   T_New T_NewArray T_Println T_ReadInteger T_ReadLine
 %token   T_Pool T_Life T_Spawn T_Let T_Usize T_F32 T_Fn T_FuncReturn T_In T_Continue T_Const T_Loop T_Colon
 
 
@@ -253,6 +253,7 @@ Type      :    T_Usize               { $$ = Type::usizeType; }
           |    T_F32                 { $$ = Type::f32Type; }
           |    T_Bool                { $$ = Type::boolType; }
           |    T_String              { $$ = Type::stringType; }
+          |    T_Void                { $$ = Type::voidType; }
           |    NamedType
           |    ArrayType
           ;
@@ -416,7 +417,7 @@ Default    : T_Default ':' Stmts     { $$ = new DefaultStmt($3); }
            |                         { $$ = NULL; }
            ;
 
-PrintStmt  : T_Print '(' Exprs ')' ';' 
+PrintStmt  : T_Println '(' Exprs ')' ';' 
                                      { $$ = new PrintStmt($3); }
            ;
            
@@ -431,9 +432,10 @@ Expr       :  AssignExpr
            |  RelationalExpr
            |  LogicalExpr
            |  PostfixExpr
-    	   |  T_ReadInteger '(' ')'  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
+    	     |  T_ReadInteger '(' ')'  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
            |  T_ReadLine '(' ')'     { $$ = new ReadLineExpr(Join(@1, @3)); }
            |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
+           |  T_Spawn '(' T_Identifier ')' { $$ = new SpawnExpr(Join(@1, @3), new NamedType(new Identifier(@2, $3))); }
            |  T_NewArray '(' Expr ',' Type ')'
                                      { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
            ;
