@@ -1,0 +1,5 @@
+fn main() -> void {
+    let a: usize [];
+    let b: usize;
+    b = a[1.0];
+}

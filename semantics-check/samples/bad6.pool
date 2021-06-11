@@ -1,0 +1,12 @@
+fn add(x: usize, y: usize) -> usize {
+    return x + y;
+}
+
+fn main() -> void {
+    let a: usize;
+    let b: f32;
+    let c: usize;
+    a = 1;
+    b = 2.0;
+    c = add(a, b);
+}

@@ -56,7 +56,7 @@ bool NamedType::HasSameType(Type *nt) {
 void NamedType::CheckTypeError() {
   const char *name = this->id->GetName();
   Decl *decl = Pool::sym_table->Lookup(name);
-  if ((decl == NULL) || (((typeid(*decl) != typeid(ClassDecl))) && ((typeid(*decl) != typeid(InterfaceDecl)))))
+  if ((decl == NULL) || (((typeid(*decl) != typeid(LifeDecl))) && ((typeid(*decl) != typeid(InterfaceDecl)))))
     {
       ReportError::IdentifierNotDeclared(id, LookingForType);
       this->id = NULL;

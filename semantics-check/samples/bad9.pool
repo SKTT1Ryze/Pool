@@ -1,0 +1,9 @@
+life Cat {
+    let name: string;
+}
+
+fn main() -> void {
+    let cat: Cat;
+    let s: string;
+    s = cat.name;
+}

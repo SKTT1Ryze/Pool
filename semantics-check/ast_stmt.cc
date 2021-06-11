@@ -190,9 +190,9 @@ void ReturnStmt::CheckStatements() {
             {
               if (!strcmp(given, expected))
                 return;
-              else if (typeid(*gdecl) == typeid(ClassDecl))
+              else if (typeid(*gdecl) == typeid(LifeDecl))
                 {
-                  ClassDecl *gcldecl = dynamic_cast<ClassDecl*>(gdecl);
+                  LifeDecl *gcldecl = dynamic_cast<LifeDecl*>(gdecl);
                   if (gcldecl->IsCompatibleWith(edecl))
                     return;
                 }

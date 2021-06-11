@@ -286,9 +286,9 @@ Formals   :    Variables
           |                          { $$ = new List<VarDecl*>; }
           ;
           
-Variables :    Variables ',' Type T_Identifier
-                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
-          |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+Variables :    Variables ',' T_Identifier T_Colon Type
+                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $3), $5)); }
+          |     T_Identifier T_Colon Type    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $1), $3)); }
           ;
           
 ClassDecl :    T_Class T_Identifier Extend Impl '{' Fields '}'              

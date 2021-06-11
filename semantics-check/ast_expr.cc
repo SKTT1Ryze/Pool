@@ -74,14 +74,14 @@ void ArithmeticExpr::CheckStatements() {
   rt = this->right->GetTypeName();
   if (lt && rt) // binary
     {
-      if ((strcmp(lt, "int") && strcmp(lt, "double")) ||
-          (strcmp(rt, "int") && strcmp(rt, "double")) ||
+      if ((strcmp(lt, "usize") && strcmp(lt, "f32")) ||
+          (strcmp(rt, "usize") && strcmp(rt, "f32")) ||
           (strcmp(lt, rt)))
         ReportError::IncompatibleOperands(this->op, new Type(lt), new Type(rt));
     }
   else if (rt) // unary
     {
-      if (strcmp(rt, "int") && strcmp(rt, "double"))
+      if (strcmp(rt, "usize") && strcmp(rt, "f32"))
         ReportError::IncompatibleOperand(this->op, new Type(rt));
     }
 }
@@ -94,8 +94,8 @@ void RelationalExpr::CheckStatements() {
   const char *rt = this->right->GetTypeName();
   if (lt && rt) // binary
     {
-      if ((strcmp(lt, "int") && strcmp(lt, "double")) ||
-	  (strcmp(rt, "int") && strcmp(rt, "double")) ||
+      if ((strcmp(lt, "usize") && strcmp(lt, "f32")) ||
+	  (strcmp(rt, "usize") && strcmp(rt, "f32")) ||
 	  (strcmp(lt, rt)))
 	ReportError::IncompatibleOperands(this->op, new Type(lt), new Type(rt));
     }
@@ -115,15 +115,15 @@ void EqualityExpr::CheckStatements() {
 	{
 	  if (!strcmp(lt, rt))
 	    return;
-	  else if (typeid(*ldecl) == typeid(ClassDecl))
+	  else if (typeid(*ldecl) == typeid(LifeDecl))
 	    {
-	      ClassDecl *lcldecl = dynamic_cast<ClassDecl*>(ldecl);
+	      LifeDecl *lcldecl = dynamic_cast<LifeDecl*>(ldecl);
 	      if (lcldecl->IsCompatibleWith(rdecl))
 		return;
 	    }
-	  else if (typeid(*rdecl) == typeid(ClassDecl))
+	  else if (typeid(*rdecl) == typeid(LifeDecl))
 	    {
-	      ClassDecl *rcldecl = dynamic_cast<ClassDecl*>(rdecl);
+	      LifeDecl *rcldecl = dynamic_cast<LifeDecl*>(rdecl);
 	      if (rcldecl->IsCompatibleWith(ldecl))
 		return;
 	    }
@@ -173,9 +173,9 @@ void AssignExpr::CheckStatements() {
         {
           if (!strcmp(lt, rt))
             return;
-          else if (typeid(*rdecl) == typeid(ClassDecl))
+          else if (typeid(*rdecl) == typeid(LifeDecl))
 	    {
-	      ClassDecl *rcldecl = dynamic_cast<ClassDecl*>(rdecl);
+	      LifeDecl *rcldecl = dynamic_cast<LifeDecl*>(rdecl);
 	      if (rcldecl->IsCompatibleWith(ldecl))
 		return;
 	    }
@@ -192,9 +192,9 @@ void This::CheckStatements() {
   Node *parent = this->GetParent();
   while (parent)
     {
-      if (typeid(*parent) == typeid(ClassDecl))
+      if (typeid(*parent) == typeid(LifeDecl))
         {
-          this->type = new NamedType(dynamic_cast<ClassDecl*>(parent)->GetID());
+          this->type = new NamedType(dynamic_cast<LifeDecl*>(parent)->GetID());
           return;
         }
       parent = parent->GetParent();
@@ -228,7 +228,7 @@ void ArrayAccess::CheckStatements() {
   if (typeid(*this->base->GetType()) != typeid(ArrayType))
     ReportError::BracketsOnNonArray(this->base);
   this->subscript->CheckStatements();
-  if (strcmp(this->subscript->GetTypeName(), "int"))
+  if (strcmp(this->subscript->GetTypeName(), "usize"))
     ReportError::SubscriptNotInteger(this->subscript);
 }
 
@@ -250,7 +250,7 @@ void FieldAccess::CheckStatements() {
       if (name)
 	{
 	  Node *parent = this->GetParent();
-	  Decl *cldecl = NULL; // look for ClassDecl
+	  Decl *cldecl = NULL; // look for LifeDecl
 	  // whether the base is this
 	  // otherwise the variable is inaccessible
 	  while (parent)
@@ -329,9 +329,9 @@ void Call::CheckArguments(FnDecl *fndecl) {
               if (gdecl && edecl) // objects
                 {
                   if (strcmp(given, expected))
-		    if (typeid(*gdecl) == typeid(ClassDecl))
+		    if (typeid(*gdecl) == typeid(LifeDecl))
 		      {
-			ClassDecl *gcldecl = dynamic_cast<ClassDecl*>(gdecl);
+			LifeDecl *gcldecl = dynamic_cast<LifeDecl*>(gdecl);
 			if (!gcldecl->IsCompatibleWith(edecl))
 			  ReportError::ArgMismatch(expr, (i+1), new Type(given), new Type(expected));
 		      }
@@ -411,7 +411,7 @@ void NewExpr::CheckStatements() {
       if (name)
         {
           Decl *decl = Pool::sym_table->Lookup(name);
-          if ((decl == NULL) || (typeid(*decl) != typeid(ClassDecl)))
+          if ((decl == NULL) || (typeid(*decl) != typeid(LifeDecl)))
             ReportError::IdentifierNotDeclared(new Identifier(*this->cType->GetLocation(), name), LookingForClass);
         }
     }
@@ -429,7 +429,7 @@ void SpawnExpr::CheckStatements() {
       if (name)
         {
           Decl *decl = Pool::sym_table->Lookup(name);
-          if ((decl == NULL) || (typeid(*decl) != typeid(ClassDecl)))
+          if ((decl == NULL) || (typeid(*decl) != typeid(LifeDecl)))
             ReportError::IdentifierNotDeclared(new Identifier(*this->cType->GetLocation(), name), LookingForClass);
         }
     }
@@ -455,7 +455,7 @@ const char *NewArrayExpr::GetTypeName() {
 
 void NewArrayExpr::CheckStatements() {
   this->size->CheckStatements();
-  if (strcmp(this->size->GetTypeName(), "int"))
+  if (strcmp(this->size->GetTypeName(), "usize"))
     ReportError::NewArraySizeNotInteger(this->size);
   this->elemType->CheckTypeError();
 }
@@ -482,7 +482,7 @@ void PostfixExpr::CheckStatements() {
     {
       this->lvalue->CheckStatements();
       const char *name = this->lvalue->GetTypeName();
-      if (strcmp(name, "int") && strcmp(name, "double"))
+      if (strcmp(name, "usize") && strcmp(name, "f32"))
 	ReportError::IncompatibleOperand(this->optr, this->lvalue->GetType());
     }
 }
