@@ -2,6 +2,7 @@ fn main() -> void {
     let i: usize;
     for(i = 0; i < 10; i++) {
         println("loop");
+        break;
     }
-    
+    break;
 }

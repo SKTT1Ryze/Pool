@@ -545,7 +545,6 @@ void FnDecl::CheckDeclError() {
 	  }
 	  if(!has_return_stmt && strcmp(this->GetType()->GetTypeName(), "void")) ReportError::NoReturnStmt(this);
   }
-    
 }
 
 void FnDecl::SetFunctionBody(StmtBlock *b) {
