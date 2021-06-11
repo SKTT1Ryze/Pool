@@ -1,0 +1,13 @@
+life Fish {
+    let name: string;
+    fn get_name() -> string {
+        return name;
+    }
+}
+
+fn main() -> void {
+    let f: Fish;
+    let a: usize;
+    let b: f32;
+    f = a + b;
+}

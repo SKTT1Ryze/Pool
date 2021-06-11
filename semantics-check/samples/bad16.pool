@@ -1,0 +1,4 @@
+fn no_return() -> usize {
+    let a: usize;
+    a = 0;
+}

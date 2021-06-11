@@ -37,6 +37,7 @@ class Pool : public Node
 class Stmt : public Node
 {
   public:
+     string type();
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
 };
@@ -45,11 +46,11 @@ class StmtBlock : public Stmt
 {
   protected:
     List<VarDecl*> *decls;
-    List<Stmt*> *stmts;
     Hashtable<Decl*> *sym_table; // keep a symbol table for every local scope
                                  // no need for removal when leaving the scope
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
+    List<Stmt*> *stmts;
     void CheckStatements();
     void CheckDeclError();
     Hashtable<Decl*> *GetSymTable() { return sym_table; }

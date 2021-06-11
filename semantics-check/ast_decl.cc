@@ -537,8 +537,12 @@ void FnDecl::CheckDeclError() {
 	    }
 	}
     }
-  if (this->body)
-    this->body->CheckDeclError();
+  if (this->body) {
+	  this->body->CheckDeclError();
+	  bool has_return_stmt = false;
+	  
+  }
+    
 }
 
 void FnDecl::SetFunctionBody(StmtBlock *b) {

@@ -61,6 +61,7 @@ void StmtBlock::CheckStatements() {
           stmt->CheckStatements();
         }
     }
+
 }
 
 void StmtBlock::CheckDeclError() {
@@ -100,6 +101,8 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
   (this->test=t)->SetParent(this); 
   (this->body=b)->SetParent(this);
 }
+
+
 
 void ConditionalStmt::CheckStatements() {
   this->test->CheckStatements();

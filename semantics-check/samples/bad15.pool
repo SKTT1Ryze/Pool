@@ -1,0 +1,3 @@
+fn plus(x: f32) -> usize {
+    return x + 1.0;
+}

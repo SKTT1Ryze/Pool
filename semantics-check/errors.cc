@@ -150,6 +150,12 @@ void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected)
   OutputError(rStmt->GetLocation(), s.str());
 }
 
+void ReportError::NoReturnStmt(Identifier *fun) {
+  ostringstream s;
+  s << "function " << fun << "has no return stmt";
+  OutputError(fun->GetLocation(), s.str());
+}
+
 void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
   ostringstream s;
   s << base << " has no such field '" << field <<"'";

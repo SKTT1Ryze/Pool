@@ -1,0 +1,7 @@
+fn main() -> void {
+    let a: usize;
+    let b: usize;
+    a = 0;
+    b = 1;
+    (a = b)++;
+}

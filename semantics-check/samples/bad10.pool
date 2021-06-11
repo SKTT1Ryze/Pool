@@ -1,0 +1,13 @@
+life Cat {
+    let name: string;
+    fn get_name() -> string {
+        return name;
+    }
+}
+
+fn main() -> void {
+    let cat: Cat;
+    let s: string;
+    // s = cat.get_name();
+    s = cat.sget_name();
+}

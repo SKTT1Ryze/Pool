@@ -1,9 +1,5 @@
-life Cat {
-    let name: string;
-}
-
 fn main() -> void {
-    let cat: Cat;
+    let cat: usize;
     let s: string;
     s = cat.name;
 }
