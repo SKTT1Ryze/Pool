@@ -543,7 +543,7 @@ void FnDecl::CheckDeclError() {
 	  for(int i = 0; i < this->body->stmts->NumElements(); i++) {
 		  if(this->body->stmts->Nth(i)->type == "return stmt") has_return_stmt = true;
 	  }
-	  if(!has_return_stmt) ReportError::NoReturnStmt(this);
+	  if(!has_return_stmt && strcmp(this->GetType()->GetTypeName(), "void")) ReportError::NoReturnStmt(this);
   }
     
 }
