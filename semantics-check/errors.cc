@@ -150,7 +150,7 @@ void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected)
   OutputError(rStmt->GetLocation(), s.str());
 }
 
-void ReportError::NoReturnStmt(Identifier *fun) {
+void ReportError::NoReturnStmt(FnDecl *fun) {
   ostringstream s;
   s << "function " << fun << "has no return stmt";
   OutputError(fun->GetLocation(), s.str());

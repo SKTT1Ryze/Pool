@@ -26,7 +26,7 @@ class Expr : public Stmt
 
   public:
     // 位置
-    Expr(yyltype loc) : Stmt(loc) {}
+    Expr(yyltype loc) : Stmt(loc, "expr") {}
     Expr() : Stmt() {}
     virtual Type *GetType() { return type; }
     virtual const char *GetTypeName() { if (type) return type->GetTypeName(); else return NULL;}

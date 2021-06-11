@@ -37,9 +37,11 @@ class Pool : public Node
 class Stmt : public Node
 {
   public:
-     string type();
+     string type;
      Stmt() : Node() {}
-     Stmt(yyltype loc) : Node(loc) {}
+     Stmt(yyltype loc, string type) : Node(loc) {
+       this->type = type;
+     }
 };
 
 class StmtBlock : public Stmt 
@@ -107,7 +109,7 @@ class IfStmt : public ConditionalStmt
 class BreakStmt : public Stmt 
 {
   public:
-    BreakStmt(yyltype loc) : Stmt(loc) {}
+    BreakStmt(yyltype loc) : Stmt(loc, "break stmt") {}
     void CheckStatements();
 };
 

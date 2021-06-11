@@ -540,7 +540,10 @@ void FnDecl::CheckDeclError() {
   if (this->body) {
 	  this->body->CheckDeclError();
 	  bool has_return_stmt = false;
-	  
+	  for(int i = 0; i < this->body->stmts->NumElements(); i++) {
+		  if(this->body->stmts->Nth(i)->type == "return stmt") has_return_stmt = true;
+	  }
+	  if(!has_return_stmt) ReportError::NoReturnStmt(this);
   }
     
 }

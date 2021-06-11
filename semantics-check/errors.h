@@ -26,6 +26,7 @@ class ReturnStmt;
 class This;
 class Decl;
 class Operator;
+class FnDecl;
 
 /**
  * General notes on using this class
@@ -97,7 +98,7 @@ class ReportError {
   // Errors used by semantic analyzer for control structures
   static void TestNotBoolean(Expr *testExpr);
   static void ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected);
-  static void NoReturnStmt(Identifier *fun);
+  static void NoReturnStmt(FnDecl *fun);
   static void BreakOutsideLoop(BreakStmt *bStmt);
 
 

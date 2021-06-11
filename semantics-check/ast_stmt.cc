@@ -103,7 +103,6 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 }
 
 
-
 void ConditionalStmt::CheckStatements() {
   this->test->CheckStatements();
   if (strcmp(this->test->GetTypeName(), "bool"))
@@ -164,7 +163,7 @@ void BreakStmt::CheckStatements() {
   ReportError::BreakOutsideLoop(this);
 }
 
-ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
+ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc, "return stmt") { 
   Assert(e != NULL);
   (expr=e)->SetParent(this);
 }
