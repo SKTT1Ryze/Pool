@@ -106,7 +106,7 @@ void yyerror(const char *msg); // standard error-handling routine
  * Bison will assign unique numbers to these and export the #define
  * in the generated y.tab.h header file.
  */	
-%token   T_Void T_Bool T_String T_Class
+%token   T_Void T_Bool T_String
 %token   T_LessEqual T_GreaterEqual T_Equal T_NotEqual T_Dims T_Increment T_Decrement
 %token   T_And T_Or T_Null T_Inherit T_This T_Interface T_Implements
 %token   T_While T_For T_If T_Else T_Return T_Break T_Switch T_Case T_Default
@@ -138,7 +138,6 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <decl>          Decl
 %type <vardecl>       VarDecl
 %type <fndecl>        FnDecl
-%type <classdecl>     ClassDecl
 %type <interfacedecl> InterfaceDecl
 %type <simpletype>    Type
 %type <namedtype>     NamedType
@@ -241,7 +240,6 @@ DeclList  :    DeclList Decl         { ($$ = $1)->Append($2); }
 
 Decl      :    VarDecl              
           |    FnDecl                  
-          |    ClassDecl
           |    LifeDecl
           |    InterfaceDecl
           ;
@@ -291,12 +289,6 @@ Variables :    Variables ',' T_Identifier T_Colon Type
           |     T_Identifier T_Colon Type    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $1), $3)); }
           ;
           
-ClassDecl :    T_Class T_Identifier Extend Impl '{' Fields '}'              
-                                     { $$ = new ClassDecl(new Identifier(@2, $2), $3, $4, $6); }
-          |    T_Class T_Identifier Extend Impl '{' '}'
-                                     { $$ = new ClassDecl(new Identifier(@2, $2), $3, $4, new List<Decl*>); }                           
-          ;
-
 LifeDecl :    T_Life T_Identifier Extend Impl '{' Fields '}'              
                                      { $$ = new LifeDecl(new Identifier(@2, $2), $3, $4, $6); }
           |   T_Life T_Identifier Extend Impl '{' '}'

@@ -92,7 +92,6 @@ END_COMMENT        ("*/")
 "double"                 { return T_F32; }
 "bool"                   { return T_Bool; }
 "string"                 { return T_String; }
-"class"                  { return T_Class; }
 "interface"              { return T_Interface; }
 "null"                   { return T_Null; }
 "this"                   { return T_This; }
