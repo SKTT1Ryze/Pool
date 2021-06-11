@@ -58,7 +58,7 @@ y.tab.o: y.tab.c
 	$(CC) $(CFLAGS) -c -o y.tab.o y.tab.c
 
 y.tab.h y.tab.c: parser.y
-	$(YACC) $(YACCFLAGS) parser.y
+	@$(YACC) $(YACCFLAGS) parser.y > /dev/null 2>&1
 .cc.o: $*.cc
 	$(CC) $(CFLAGS) -c -o $@ $*.cc
 

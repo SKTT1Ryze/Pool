@@ -34,6 +34,9 @@ fn main() -> void {
   for (i = 0; i < 10; i= i + 1) {
     println("for loop");
   }
+  if(i > 0) {
+    println("i grater than zeor");
+  }
   while(true) {}
   return;
 }
