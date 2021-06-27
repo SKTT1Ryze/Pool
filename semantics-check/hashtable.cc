@@ -97,6 +97,7 @@ Iterator<Value> Hashtable<Value>::GetIterator()
 template <class Value> 
 Value Iterator<Value>::GetNextValue()
 {
+  
   return (cur == end ? NULL : (*cur++).second);
 }
 
